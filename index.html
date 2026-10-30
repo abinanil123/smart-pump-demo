@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Smart Pump 250m Controller</title>
+  <style>
+    :root {
+      --ios-bg: #000000;
+      --ios-card: rgba(28, 28, 30, 0.65);
+      --ios-card-solid: #1c1c1e;
+      --ios-card-active: rgba(44, 44, 46, 0.75);
+      --ios-border: rgba(255, 255, 255, 0.12);
+      --ios-border-focus: rgba(255, 255, 255, 0.25);
+      --ios-text: #ffffff;
+      --ios-text-secondary: rgba(235, 235, 245, 0.6);
+      --ios-text-tertiary: rgba(235, 235, 245, 0.38);
+      --ios-blue: #007aff;
+      --ios-green: #34c759;
+      --ios-orange: #ff9500;
+      --ios-red: #ff3b30;
+      --ios-teal: #30b0c7;
+      --ios-indigo: #5856d6;
+      --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--ios-bg);
+      color: var(--ios-text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      background-image: 
+        radial-gradient(at 10% 20%, rgba(0, 122, 255, 0.18) 0px, transparent 50%),
+        radial-gradient(at 90% 80%, rgba(52, 199, 89, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(88, 86, 214, 0.10) 0px, transparent 60%);
+      background-attachment: fixed;
+      padding: 16px 12px 60px 12px;
+      overflow-x: hidden;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* iOS Glassmorphism Card Base */
+    .glass-card {
+      background: var(--ios-card);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border: 1px solid var(--ios-border);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+    }
+
+    .glass-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+    }
+
+    /* Header Bar */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 6px;
+    }
+
+    .app-title-group h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+    }
+
+    .app-title-group p {
+      font-size: 11px;
+      color: var(--ios-text-secondary);
+      font-weight: 500;
+    }
+
+    .header-pills {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--ios-border);
+      color: var(--ios-text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pill-badge.active-green {
+      background: rgba(52, 199, 89, 0.16);
+      border-color: rgba(52, 199, 89, 0.35);
+      color: #4ade80;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 8px #4ade80;
+      animation: pulse-dot 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Segmented Control Bar */
+    .segmented-control {
+      display: flex;
+      background: rgba(118, 118, 128, 0.24);
+      padding: 3px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .segment-tab {
+      flex: 1;
+      padding: 8px 4px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ios-text-secondary);
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .segment-tab.active {
+      background: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    /* Hero Power Card */
+    .hero-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 30px 20px 24px 20px;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      margin-bottom: 24px;
+      transition: all 0.3s;
+    }
+
+    .chip-idle { background: rgba(142, 142, 147, 0.18); color: #aeaeb2; border: 1px solid rgba(142, 142, 147, 0.25); }
+    .chip-running { background: rgba(52, 199, 89, 0.2); color: #34c759; border: 1px solid rgba(52, 199, 89, 0.4); box-shadow: 0 0 16px rgba(52, 199, 89, 0.25); }
+    .chip-starting { background: rgba(0, 122, 255, 0.2); color: #0a84ff; border: 1px solid rgba(0, 122, 255, 0.4); animation: pulse-blue 1s infinite alternate; }
+    .chip-fault { background: rgba(255, 59, 48, 0.22); color: #ff453a; border: 1px solid rgba(255, 59, 48, 0.45); box-shadow: 0 0 20px rgba(255, 59, 48, 0.35); }
+
+    @keyframes pulse-blue {
+      0% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+
+    /* Large Tactile iOS Power Button */
+    .power-button-wrapper {
+      position: relative;
+      margin-bottom: 22px;
+    }
+
+    .power-glow-ring {
+      position: absolute;
+      top: -12px;
+      left: -12px;
+      right: -12px;
+      bottom: -12px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--ios-green), var(--ios-blue), var(--ios-teal), var(--ios-green));
+      filter: blur(14px);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      animation: spin-glow 4s linear infinite;
+    }
+
+    .power-button-wrapper.is-running .power-glow-ring {
+      opacity: 0.7;
+    }
+
+    .power-button-wrapper.is-fault .power-glow-ring {
+      background: var(--ios-red);
+      opacity: 0.8;
+      filter: blur(16px);
+      animation: none;
+    }
+
+    @keyframes spin-glow {
+      100% { transform: rotate(360deg); }
+    }
+
+    .btn-power {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #2c2c2e, #1c1c1e);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+      transition: transform 0.15s cubic-bezier(0.17, 0.89, 0.32, 1.28), background 0.3s;
+    }
+
+    .btn-power:active {
+      transform: scale(0.93);
+    }
+
+    .btn-power svg {
+      width: 44px;
+      height: 44px;
+      stroke: #fff;
+      transition: stroke 0.3s;
+    }
+
+    .btn-power span {
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 8px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--ios-text-secondary);
+      transition: color 0.3s;
+    }
+
+    .power-button-wrapper.is-running .btn-power {
+      background: linear-gradient(145deg, #1e3a24, #122316);
+      border-color: rgba(52, 199, 89, 0.6);
+    }
+
+    .power-button-wrapper.is-running .btn-power svg {
+      stroke: var(--ios-green);
+    }
+
+    .power-button-wrapper.is-running .btn-power span {
+      color: var(--ios-green);
+    }
+
+    .runtime-display {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ios-text-secondary);
+      font-variant-numeric: tabular-nums;
+      margin-top: 4px;
+    }
+
+    /* 2x2 Metric Tiles Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .metric-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 104px;
+      padding: 14px;
+    }
+
+    .metric-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .metric-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ios-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .metric-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--ios-text-tertiary);
+    }
+
+    .metric-value-wrap {
+      margin-top: 8px;
+    }
+
+    .metric-value {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric-unit {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ios-text-secondary);
+      margin-left: 2px;
+    }
+
+    .metric-sub {
+      font-size: 10px;
+      color: var(--ios-text-tertiary);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    /* Tank Visualizer */
+    .tank-display-container {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 10px 4px;
+    }
+
+    .tank-capsule {
+      width: 90px;
+      height: 160px;
+      border-radius: 28px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      background: rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 18px rgba(0,0,0,0.6);
+      flex-shrink: 0;
+    }
+
+    .water-fill {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 65%;
+      background: linear-gradient(180deg, #38bdf8, #0284c7);
+      transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 -4px 12px rgba(56, 189, 248, 0.5);
+    }
+
+    .water-wave {
+      position: absolute;
+      top: -10px;
+      left: -50%;
+      width: 200%;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.35);
+      border-radius: 40%;
+      animation: wave-motion 3s linear infinite;
+    }
+
+    @keyframes wave-motion {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .tank-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      padding-bottom: 6px;
+    }
+
+    .detail-label {
+      font-size: 12px;
+      color: var(--ios-text-secondary);
+      font-weight: 500;
+    }
+
+    .detail-val {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .foil-sensor-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 11px;
+      color: #7dd3fc;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    /* Sandbox Scenario Action Buttons */
+    .sandbox-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn-sandbox {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--ios-border);
+      border-radius: 14px;
+      padding: 12px 10px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+
+    .btn-sandbox:active {
+      transform: scale(0.96);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-sandbox .sub {
+      font-size: 10px;
+      color: var(--ios-text-secondary);
+      font-weight: 400;
+    }
+
+    .btn-sandbox.btn-reset {
+      grid-column: span 2;
+      background: rgba(52, 199, 89, 0.15);
+      border-color: rgba(52, 199, 89, 0.4);
+      color: #4ade80;
+      align-items: center;
+      padding: 14px;
+    }
+
+    /* Tab content view switching */
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* OTA Cloud Card */
+    .ota-progress-bar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 12px 0 6px 0;
+    }
+
+    .ota-progress-fill {
+      width: 0%;
+      height: 100%;
+      background: var(--ios-blue);
+      border-radius: 10px;
+      transition: width 0.3s;
+    }
+
+    /* Banner Alert Notification */
+    .toast-banner {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: rgba(30, 30, 30, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--ios-border);
+      padding: 12px 20px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      z-index: 100;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+
+    .toast-banner.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toast-banner" id="toastBanner">
+    <span id="toastIcon">ℹ️</span>
+    <span id="toastMsg">Notification</span>
+  </div>
+
+  <div class="app-container">
+    
+    <!-- Top Header Bar -->
+    <div class="header-bar">
+      <div class="app-title-group">
+        <h1>Smart Pump House</h1>
+        <p>Agricultural 250m ESP-NOW Link</p>
+      </div>
+      <div class="header-pills">
+        <div class="pill-badge active-green" id="networkPill" onclick="toggleNetworkMode()">
+          <span class="status-dot"></span>
+          <span id="networkText">Local Wi-Fi</span>
+        </div>
+        <div class="pill-badge" id="audioPill" onclick="toggleAudio()">
+          <span id="audioIcon">🔊</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Segmented Navigation Bar -->
+    <div class="segmented-control">
+      <div class="segment-tab active" onclick="switchTab('control', this)">Live Control</div>
+      <div class="segment-tab" onclick="switchTab('tank', this)">Water Tank</div>
+      <div class="segment-tab" onclick="switchTab('sandbox', this)">Test Sandbox</div>
+      <div class="segment-tab" onclick="switchTab('ota', this)">Cloud OTA</div>
+    </div>
+
+    <!-- TAB 1: LIVE CONTROL -->
+    <div class="tab-content active" id="tab-control">
+      
+      <!-- Main Pump Hero Card -->
+      <div class="glass-card hero-card">
+        <div class="status-chip chip-idle" id="pumpChip">
+          ● PUMP IDLE / READY
+        </div>
+
+        <div class="power-button-wrapper" id="powerWrapper">
+          <div class="power-glow-ring"></div>
+          <button class="btn-power" id="powerBtn" onclick="togglePump()">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+              <line x1="12" y1="2" x2="12" y2="12"></line>
+            </svg>
+            <span id="powerBtnText">START</span>
+          </button>
+        </div>
+
+        <div class="runtime-display" id="runtimeText">Runtime: 00:00:00</div>
+      </div>
+
+      <!-- 2x2 Telemetry Metrics Grid -->
+      <div class="metrics-grid">
+        <div class="glass-card metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Motor Current</span>
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+            </div>
+          </div>
+          <div class="metric-value-wrap">
+            <span class="metric-value" id="currentVal">0.0</span>
+            <span class="metric-unit">A</span>
+            <div class="metric-sub" id="currentSub">Target: 10.0A Normal</div>
+          </div>
+        </div>
+
+        <div class="glass-card metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Active Power</span>
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+          </div>
+          <div class="metric-value-wrap">
+            <span class="metric-value" id="powerVal">0.00</span>
+            <span class="metric-unit">kW</span>
+            <div class="metric-sub">230V AC Single Phase</div>
+          </div>
+        </div>
+
+        <div class="glass-card metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Relay 1 (Hold)</span>
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+          </div>
+          <div class="metric-value-wrap">
+            <span class="metric-value" id="relay1Val" style="font-size:18px;">CLOSED</span>
+            <div class="metric-sub">NC Contactor Series</div>
+          </div>
+        </div>
+
+        <div class="glass-card metric-card">
+          <div class="metric-header">
+            <span class="metric-title">250m Radio</span>
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+            </div>
+          </div>
+          <div class="metric-value-wrap">
+            <span class="metric-value" id="rssiVal">-62</span>
+            <span class="metric-unit">dBm</span>
+            <div class="metric-sub">ESP-NOW LR (0.5 Mbps)</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 2: WATER TANK VISUALIZER -->
+    <div class="tab-content" id="tab-tank">
+      <div class="glass-card">
+        <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 14px;">Overhead Plastic Tank</h3>
+        
+        <div class="tank-display-container">
+          <div class="tank-capsule">
+            <div class="water-fill" id="waterFill">
+              <div class="water-wave"></div>
+            </div>
+          </div>
+
+          <div class="tank-details">
+            <div class="detail-row">
+              <span class="detail-label">Current Level</span>
+              <span class="detail-val" id="tankPercent">65%</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Liquid Depth</span>
+              <span class="detail-val" id="tankDepth">3.25 ft / 5.0 ft</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Est. Time to Full</span>
+              <span class="detail-val" id="tankEstTime">~14 Mins</span>
+            </div>
+            <div class="foil-sensor-tag" id="foilBadge">
+              <span>⚡</span> Capacitive Foil: Normal Level
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <h3 style="font-size: 13px; font-weight: 600; color: var(--ios-text-secondary); margin-bottom: 8px;">Contactless Sensing Principle</h3>
+        <p style="font-size: 12px; color: var(--ios-text-secondary); line-height: 1.5;">
+          A single patch of aluminum foil is taped to the <strong>outside</strong> of the plastic overhead tank. ESP32 monitors capacitance via GPIO 4 Touch0. When water touches the inner wall, the dielectric shift cuts the pump instantly without any drilling or corrosion.
+        </p>
+      </div>
+    </div>
+
+    <!-- TAB 3: TEST SANDBOX (CLIENT DEMO SCENARIOS) -->
+    <div class="tab-content" id="tab-sandbox">
+      <div class="glass-card">
+        <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 4px;">Failsafe Simulation Sandbox</h3>
+        <p style="font-size: 12px; color: var(--ios-text-secondary); margin-bottom: 14px;">
+          Click any scenario below to demonstrate the hardware safety cutoffs to your client:
+        </p>
+
+        <div class="sandbox-grid">
+          <button class="btn-sandbox" onclick="simulateDryRun()">
+            <span>⚠️ Borewell Dry-Run</span>
+            <span class="sub">Current drops &lt; 4.0A $\to$ Auto cutoff after 8s</span>
+          </button>
+
+          <button class="btn-sandbox" onclick="simulateMotorJam()">
+            <span>🚨 Motor Jam / Overload</span>
+            <span class="sub">Current spikes &gt; 16A $\to$ Instant cutoff &lt; 100ms</span>
+          </button>
+
+          <button class="btn-sandbox" onclick="simulateOverflow()">
+            <span>💧 Tank Full Overflow</span>
+            <span class="sub">Foil trips $\to$ Victory Fanfare &amp; auto-stop</span>
+          </button>
+
+          <button class="btn-sandbox" onclick="simulateWatchdog()">
+            <span>📡 Lost 250m Signal</span>
+            <span class="sub">Heartbeat drops $\to$ 3-min Watchdog auto-trip</span>
+          </button>
+
+          <button class="btn-sandbox btn-reset" onclick="resetSystem()">
+            <span>🔄 Reset to Normal Idle State</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: CLOUD & REMOTE OTA -->
+    <div class="tab-content" id="tab-ota">
+      <div class="glass-card">
+        <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 4px;">Cloud &amp; Wireless OTA</h3>
+        <p style="font-size: 12px; color: var(--ios-text-secondary); margin-bottom: 16px;">
+          Zero-subscription remote management and firmware updates from anywhere.
+        </p>
+
+        <div class="detail-row">
+          <span class="detail-label">Cloud Broker</span>
+          <span class="detail-val" style="font-size:13px; color: #4ade80;">HiveMQ TLS (Free Tier)</span>
+        </div>
+        <div class="detail-row" style="margin-top:8px;">
+          <span class="detail-label">Current Version</span>
+          <span class="detail-val" style="font-size:13px;">v2.4.0-release</span>
+        </div>
+        <div class="detail-row" style="margin-top:8px;">
+          <span class="detail-label">Latest on GitHub</span>
+          <span class="detail-val" style="font-size:13px; color: #38bdf8;">v2.5.0-ready</span>
+        </div>
+
+        <div class="ota-progress-bar">
+          <div class="ota-progress-fill" id="otaFill"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--ios-text-secondary);">
+          <span id="otaStatusText">Ready for Wireless Update</span>
+          <span id="otaPercentText">0%</span>
+        </div>
+
+        <button class="btn-sandbox btn-reset" style="margin-top:14px; background: rgba(0, 122, 255, 0.2); border-color: rgba(0, 122, 255, 0.4); color: #38bdf8;" onclick="simulateOTAUpdate()">
+          <span>⚡ Trigger Remote Cloud OTA Update</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // System State Machine
+    let isRunning = false;
+    let isStarting = false;
+    let activeFault = null;
+    let motorCurrent = 0.0;
+    let tankLevel = 65;
+    let runtimeSeconds = 0;
+    let runtimeInterval = null;
+    let currentJitterInterval = null;
+    let audioEnabled = true;
+    let isLocalMode = true;
+
+    // Web Audio Synthesizer (Genuine Passive Buzzer Melody Player)
+    let audioCtx = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playBeep(freq, durationMs, delayMs = 0) {
+      if (!audioEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        setTimeout(() => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'square'; // Matches piezo buzzer square-wave harmonics
+          osc.frequency.setValueAtTime(freq, ctx.currentTime);
+          gain.gain.setValueAtTime(0.08, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + (durationMs / 1000));
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + (durationMs / 1000));
+        }, delayMs);
+      } catch (e) {
+        console.warn('Audio blocked by browser policy:', e);
+      }
+    }
+
+    // Melodies
+    function playStartMelody() {
+      playBeep(523, 100, 0);    // C5
+      playBeep(659, 100, 120);  // E5
+      playBeep(784, 120, 240);  // G5
+      playBeep(1046, 250, 380); // C6
+    }
+
+    function playStopMelody() {
+      playBeep(784, 120, 0);    // G5
+      playBeep(659, 120, 140);  // E5
+      playBeep(523, 250, 280);  // C5
+    }
+
+    function playVictoryMelody() {
+      playBeep(523, 120, 0);    // C5
+      playBeep(659, 120, 140);  // E5
+      playBeep(784, 120, 280);  // G5
+      playBeep(1046, 350, 420); // C6
+      playBeep(784, 120, 800);  // G5
+      playBeep(1046, 400, 940); // C6
+    }
+
+    function playAlarmMelody() {
+      for (let i = 0; i < 5; i++) {
+        playBeep(2200, 80, i * 140);
+      }
+    }
+
+    // Toast Notification Banner
+    function showToast(icon, msg) {
+      const banner = document.getElementById('toastBanner');
+      document.getElementById('toastIcon').innerText = icon;
+      document.getElementById('toastMsg').innerText = msg;
+      banner.classList.add('show');
+      setTimeout(() => banner.classList.remove('show'), 3200);
+    }
+
+    // Tab Switching
+    function switchTab(tabId, el) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.segment-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      el.classList.add('active');
+    }
+
+    // Toggle Network Mode (Local Wi-Fi vs Cloud 4G)
+    function toggleNetworkMode() {
+      isLocalMode = !isLocalMode;
+      const pill = document.getElementById('networkPill');
+      const text = document.getElementById('networkText');
+      if (isLocalMode) {
+        pill.className = 'pill-badge active-green';
+        text.innerText = 'Local Wi-Fi';
+        showToast('📶', 'Connected locally to ESP32 (10ms latency)');
+      } else {
+        pill.className = 'pill-badge';
+        pill.style.background = 'rgba(0, 122, 255, 0.2)';
+        pill.style.borderColor = 'rgba(0, 122, 255, 0.4)';
+        pill.style.color = '#38bdf8';
+        text.innerText = 'Cloud 4G/5G';
+        showToast('☁️', 'Connected via Free HiveMQ Cloud MQTT Broker');
+      }
+    }
+
+    // Toggle Audio
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      document.getElementById('audioIcon').innerText = audioEnabled ? '🔊' : '🔇';
+      showToast(audioEnabled ? '🔊' : '🔇', audioEnabled ? 'Buzzer Audio Enabled' : 'Buzzer Muted');
+    }
+
+    // Pump Start / Stop Sequence
+    function togglePump() {
+      if (activeFault) {
+        showToast('⚠️', 'Clear active fault in Sandbox before starting');
+        return;
+      }
+
+      if (isRunning || isStarting) {
+        stopPumpSequence();
+      } else {
+        startPumpSequence();
+      }
+    }
+
+    function startPumpSequence() {
+      if (tankLevel >= 100) {
+        showToast('💧', 'Cannot start: Overhead tank is 100% Full!');
+        return;
+      }
+
+      isStarting = true;
+      playStartMelody();
+      showToast('⚡', 'Relay 2 Start Pulse Fired (1.8s momentary)');
+      
+      const chip = document.getElementById('pumpChip');
+      chip.className = 'status-chip chip-starting';
+      chip.innerText = '● STARTING (1.8s PULSE)...';
+
+      // Simulate contactor inrush current
+      motorCurrent = 28.4;
+      updateMetricsDisplay();
+
+      setTimeout(() => {
+        isStarting = false;
+        isRunning = true;
+        motorCurrent = 10.2;
+        chip.className = 'status-chip chip-running';
+        chip.innerText = '● 10A MOTOR RUNNING';
+
+        document.getElementById('powerWrapper').className = 'power-button-wrapper is-running';
+        document.getElementById('powerBtnText').innerText = 'STOP';
+
+        startTimers();
+        showToast('✅', 'Contactor Latched! Motor Running at 10.2A');
+      }, 1800);
+    }
+
+    function stopPumpSequence() {
+      isRunning = false;
+      isStarting = false;
+      motorCurrent = 0.0;
+      playStopMelody();
+
+      const chip = document.getElementById('pumpChip');
+      chip.className = 'status-chip chip-idle';
+      chip.innerText = '● PUMP IDLE / READY';
+
+      document.getElementById('powerWrapper').className = 'power-button-wrapper';
+      document.getElementById('powerBtnText').innerText = 'START';
+
+      stopTimers();
+      updateMetricsDisplay();
+      showToast('⏹', 'Relay 1 Opened: Contactor de-energized');
+    }
+
+    // Timers & Simulation Loops
+    function startTimers() {
+      stopTimers();
+
+      // Runtime clock
+      runtimeInterval = setInterval(() => {
+        runtimeSeconds++;
+        const hrs = String(Math.floor(runtimeSeconds / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((runtimeSeconds % 3600) / 60)).padStart(2, '0');
+        const secs = String(runtimeSeconds % 60).padStart(2, '0');
+        document.getElementById('runtimeText').innerText = `Runtime: ${hrs}:${mins}:${secs}`;
+
+        // Slowly fill tank while running
+        if (tankLevel < 100) {
+          tankLevel = Math.min(100, tankLevel + 0.2);
+          updateTankDisplay();
+        } else {
+          simulateOverflow();
+        }
+      }, 1000);
+
+      // Current micro-jitter for 100% realism
+      currentJitterInterval = setInterval(() => {
+        if (isRunning && !activeFault) {
+          const jitter = (Math.random() * 0.3 - 0.15);
+          motorCurrent = parseFloat((10.2 + jitter).toFixed(1));
+          updateMetricsDisplay();
+        }
+      }, 800);
+    }
+
+    function stopTimers() {
+      clearInterval(runtimeInterval);
+      clearInterval(currentJitterInterval);
+    }
+
+    function updateMetricsDisplay() {
+      document.getElementById('currentVal').innerText = motorCurrent.toFixed(1);
+      const kw = (motorCurrent * 230 * 0.88 / 1000).toFixed(2);
+      document.getElementById('powerVal').innerText = kw;
+    }
+
+    function updateTankDisplay() {
+      document.getElementById('waterFill').style.height = tankLevel + '%';
+      document.getElementById('tankPercent').innerText = Math.round(tankLevel) + '%';
+      const depthFt = (tankLevel * 5.0 / 100).toFixed(1);
+      document.getElementById('tankDepth').innerText = `${depthFt} ft / 5.0 ft`;
+
+      const estMins = Math.max(0, Math.round((100 - tankLevel) * 0.4));
+      document.getElementById('tankEstTime').innerText = isRunning ? `~${estMins} Mins` : 'Paused';
+    }
+
+    // Failsafe Sandbox Simulation Triggers
+    function simulateDryRun() {
+      if (!isRunning) startPumpSequence();
+
+      setTimeout(() => {
+        showToast('⚠️', 'Borewell water depleted! Current dropping...');
+        motorCurrent = 2.4;
+        updateMetricsDisplay();
+
+        const chip = document.getElementById('pumpChip');
+        chip.className = 'status-chip chip-starting';
+        chip.innerText = '⚠️ DRY-RUN DETECTED (8s TRIP)...';
+
+        setTimeout(() => {
+          activeFault = 'DRY_RUN';
+          stopPumpSequence();
+          playAlarmMelody();
+
+          chip.className = 'status-chip chip-fault';
+          chip.innerText = '🚨 FAULT: BOREWELL DRY-RUN TRIP';
+          document.getElementById('powerWrapper').className = 'power-button-wrapper is-fault';
+          showToast('🚨', 'Dry Run Protection Cutoff! Motor saved from burnout');
+        }, 3000);
+      }, 2000);
+    }
+
+    function simulateMotorJam() {
+      if (!isRunning) startPumpSequence();
+
+      setTimeout(() => {
+        showToast('🚨', 'Mechanical Jam Simulated! Current spiking > 16A');
+        motorCurrent = 18.2;
+        updateMetricsDisplay();
+
+        activeFault = 'OVERLOAD';
+        stopPumpSequence();
+        playAlarmMelody();
+
+        const chip = document.getElementById('pumpChip');
+        chip.className = 'status-chip chip-fault';
+        chip.innerText = '🚨 FAULT: MOTOR OVERLOAD TRIP (18.2A)';
+        document.getElementById('powerWrapper').className = 'power-button-wrapper is-fault';
+      }, 1500);
+    }
+
+    function simulateOverflow() {
+      tankLevel = 100;
+      updateTankDisplay();
+
+      const foil = document.getElementById('foilBadge');
+      foil.style.background = 'rgba(52, 199, 89, 0.2)';
+      foil.style.borderColor = 'rgba(52, 199, 89, 0.5)';
+      foil.style.color = '#34c759';
+      foil.innerHTML = '<span>🏆</span> Capacitive Foil: TANK 100% FULL';
+
+      if (isRunning) {
+        stopPumpSequence();
+      }
+      playVictoryMelody();
+      showToast('🏆', 'Victory Fanfare! Tank full, pump auto-stopped');
+    }
+
+    function simulateWatchdog() {
+      showToast('📡', 'Simulating 250m Radio loss...');
+      document.getElementById('rssiVal').innerText = '--';
+      setTimeout(() => {
+        activeFault = 'WATCHDOG';
+        stopPumpSequence();
+        playAlarmMelody();
+        const chip = document.getElementById('pumpChip');
+        chip.className = 'status-chip chip-fault';
+        chip.innerText = '🚨 FAULT: 3-MIN WATCHDOG TIMEOUT';
+        document.getElementById('powerWrapper').className = 'power-button-wrapper is-fault';
+      }, 2000);
+    }
+
+    function resetSystem() {
+      activeFault = null;
+      stopPumpSequence();
+      tankLevel = 65;
+      runtimeSeconds = 0;
+      document.getElementById('runtimeText').innerText = 'Runtime: 00:00:00';
+      document.getElementById('rssiVal').innerText = '-62';
+      const foil = document.getElementById('foilBadge');
+      foil.style.background = 'rgba(56, 189, 248, 0.12)';
+      foil.style.borderColor = 'rgba(56, 189, 248, 0.3)';
+      foil.style.color = '#7dd3fc';
+      foil.innerHTML = '<span>⚡</span> Capacitive Foil: Normal Level';
+      updateTankDisplay();
+      showToast('🔄', 'System reset to normal standby');
+    }
+
+    // Remote OTA Simulation
+    function simulateOTAUpdate() {
+      const fill = document.getElementById('otaFill');
+      const statusText = document.getElementById('otaStatusText');
+      const pctText = document.getElementById('otaPercentText');
+      
+      statusText.innerText = 'Downloading v2.5.0 from GitHub Releases...';
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 5;
+        fill.style.width = progress + '%';
+        pctText.innerText = progress + '%';
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          statusText.innerText = 'Flashing ESP32 Flash Memory...';
+          setTimeout(() => {
+            statusText.innerText = 'Rebooting ESP32...';
+            setTimeout(() => {
+              statusText.innerText = '✅ Updated to v2.5.0 (Online)';
+              showToast('⚡', 'Firmware v2.5.0 installed wirelessly via Cloud OTA!');
+            }, 1200);
+          }, 1000);
+        }
+      }, 100);
+    }
+
+    // Initial render
+    updateTankDisplay();
+    updateMetricsDisplay();
+  </script>
+</body>
+</html>
