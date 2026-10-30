@@ -5,22 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#030712">
   <title>Smart Pump</title>
   <style>
     :root {
       --ios-bg: #030712;
-      --ios-card: rgba(22, 27, 34, 0.65);
-      --ios-card-sheen: rgba(255, 255, 255, 0.08);
-      --ios-border: rgba(255, 255, 255, 0.16);
-      --ios-border-highlight: rgba(255, 255, 255, 0.38);
+      --ios-card: rgba(20, 24, 34, 0.68);
+      --ios-card-sheen: rgba(255, 255, 255, 0.09);
+      --ios-border: rgba(255, 255, 255, 0.14);
+      --ios-border-highlight: rgba(255, 255, 255, 0.35);
       --ios-text: #f9fafb;
-      --ios-text-secondary: rgba(243, 244, 246, 0.65);
-      --ios-text-tertiary: rgba(243, 244, 246, 0.4);
+      --ios-text-secondary: rgba(243, 244, 246, 0.68);
+      --ios-text-tertiary: rgba(243, 244, 246, 0.42);
       --ios-green: #34c759;
-      --ios-green-glow: rgba(52, 199, 89, 0.45);
+      --ios-green-glow: rgba(52, 199, 89, 0.5);
       --ios-blue: #007aff;
       --ios-cyan: #38bdf8;
       --ios-red: #ff3b30;
+      --ios-red-glow: rgba(255, 59, 48, 0.5);
       --ios-orange: #ff9500;
       --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
     }
@@ -41,12 +43,34 @@
       display: flex;
       justify-content: center;
       background-image: 
-        radial-gradient(circle at 15% 15%, rgba(0, 122, 255, 0.22) 0%, transparent 45%),
-        radial-gradient(circle at 85% 85%, rgba(52, 199, 89, 0.18) 0%, transparent 45%),
-        radial-gradient(circle at 50% 45%, rgba(99, 102, 241, 0.12) 0%, transparent 60%);
+        radial-gradient(circle at 12% 18%, rgba(59, 130, 246, 0.28) 0%, transparent 40%),
+        radial-gradient(circle at 88% 12%, rgba(168, 85, 247, 0.24) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.18) 0%, transparent 50%),
+        radial-gradient(circle at 85% 85%, rgba(34, 197, 94, 0.22) 0%, transparent 45%),
+        radial-gradient(circle at 15% 80%, rgba(99, 102, 241, 0.25) 0%, transparent 45%);
       background-attachment: fixed;
-      padding: 18px 14px 60px 14px;
+      padding: 14px 14px 80px 14px;
       overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Living Ambient Glowing Orbs */
+    .ambient-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.45;
+      animation: orb-drift 18s infinite alternate ease-in-out;
+    }
+    .orb-1 { width: 340px; height: 340px; background: #0284c7; top: -60px; left: -80px; }
+    .orb-2 { width: 320px; height: 320px; background: #7c3aed; bottom: 40px; right: -80px; animation-duration: 22s; }
+
+    @keyframes orb-drift {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(40px, 30px) scale(1.12); }
+      100% { transform: translate(-30px, 50px) scale(0.95); }
     }
 
     .app-viewport {
@@ -54,18 +78,164 @@
       max-width: 440px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Apple Dynamic Island */
+    .island-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2px;
+    }
+
+    .dynamic-island {
+      background: #000000;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 36px;
+      padding: 6px 14px;
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      max-width: 96%;
+    }
+
+    .dynamic-island.is-expanded {
+      padding: 10px 18px;
+      border-radius: 28px;
+      background: rgba(10, 14, 22, 0.95);
+      border-color: rgba(56, 189, 248, 0.4);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.85), 0 0 20px rgba(56, 189, 248, 0.25);
+    }
+
+    .dynamic-island.is-fault {
+      border-color: rgba(255, 59, 48, 0.6);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.85), 0 0 25px rgba(255, 59, 48, 0.35);
+      animation: island-pulse 1s infinite alternate;
+    }
+
+    @keyframes island-pulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.02); }
+    }
+
+    .island-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #34c759;
+      box-shadow: 0 0 8px #34c759;
+      flex-shrink: 0;
+    }
+
+    .island-dot.red { background: #ff3b30; box-shadow: 0 0 10px #ff3b30; }
+    .island-dot.blue { background: #38bdf8; box-shadow: 0 0 10px #38bdf8; animation: pulse 1s infinite; }
+
+    .island-text {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .island-subtag {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--ios-text-secondary);
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 7px;
+      border-radius: 100px;
+    }
+
+    /* Top Brand Header */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px;
+    }
+
+    .brand-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.7px;
+      background: linear-gradient(180deg, #ffffff 40%, rgba(255, 255, 255, 0.68) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-title span.badge-chip {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 3px 8px;
+      border-radius: 100px;
+      -webkit-text-fill-color: #38bdf8;
+      vertical-align: middle;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--ios-text-secondary);
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      margin-top: 1px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .liquid-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 13px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(25px);
+      border: 1px solid var(--ios-border);
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+      color: var(--ios-text-secondary);
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .liquid-pill:active { transform: scale(0.94); }
+    .liquid-pill.active-mode {
+      background: rgba(52, 199, 89, 0.16);
+      border-color: rgba(52, 199, 89, 0.45);
+      color: #4ade80;
     }
 
     /* True Apple Liquid Glass Cards */
     .liquid-card {
       background: linear-gradient(145deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 100%), var(--ios-card);
-      backdrop-filter: blur(32px) saturate(200%);
-      -webkit-backdrop-filter: blur(32px) saturate(200%);
+      backdrop-filter: blur(34px) saturate(210%);
+      -webkit-backdrop-filter: blur(34px) saturate(210%);
       border: 1px solid var(--ios-border);
       border-top: 1.5px solid var(--ios-border-highlight);
       border-radius: 26px;
-      padding: 20px;
+      padding: 18px;
       box-shadow: 
         0 20px 40px rgba(0, 0, 0, 0.55),
         inset 0 1px 1px rgba(255, 255, 255, 0.35),
@@ -86,356 +256,40 @@
       pointer-events: none;
     }
 
-    /* Header Bar */
-    .header-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 4px 6px;
-    }
-
-    .brand-title {
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.6px;
-      background: linear-gradient(180deg, #ffffff 30%, rgba(255, 255, 255, 0.7) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .brand-sub {
-      font-size: 11px;
-      color: var(--ios-text-secondary);
-      font-weight: 600;
-      letter-spacing: 0.2px;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .liquid-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 100px;
-      font-size: 11px;
-      font-weight: 600;
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--ios-border);
-      border-top: 1px solid rgba(255, 255, 255, 0.25);
-      color: var(--ios-text-secondary);
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .liquid-pill:active {
-      transform: scale(0.95);
-    }
-
-    .liquid-pill.active-mode {
-      background: rgba(52, 199, 89, 0.18);
-      border-color: rgba(52, 199, 89, 0.45);
-      color: #4ade80;
-      box-shadow: 0 0 16px rgba(52, 199, 89, 0.25);
-    }
-
-    .glow-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #4ade80;
-      box-shadow: 0 0 8px #4ade80;
-      animation: pulse-ring 2s infinite ease-in-out;
-    }
-
-    @keyframes pulse-ring {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(0.8); opacity: 0.4; }
-    }
-
-    /* Segmented Navigation */
-    .segmented-bar {
-      display: flex;
-      background: rgba(30, 30, 35, 0.6);
-      backdrop-filter: blur(25px);
-      padding: 4px;
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .segment-btn {
-      flex: 1;
-      padding: 8px 4px;
-      text-align: center;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--ios-text-secondary);
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .segment-btn.active {
-      background: rgba(255, 255, 255, 0.16);
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.35);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-    }
-
-    /* Main Hero Control Card */
-    .hero-center {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 26px 18px 20px 18px;
-    }
-
-    .status-badge-liquid {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 7px 16px;
-      border-radius: 100px;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-      margin-bottom: 22px;
-      backdrop-filter: blur(15px);
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .badge-idle {
-      background: rgba(142, 142, 147, 0.16);
-      color: #d1d5db;
-      border: 1px solid rgba(142, 142, 147, 0.3);
-    }
-
-    .badge-running {
-      background: rgba(52, 199, 89, 0.22);
-      color: #34c759;
-      border: 1.5px solid rgba(52, 199, 89, 0.5);
-      box-shadow: 0 0 24px rgba(52, 199, 89, 0.35);
-    }
-
-    .badge-starting {
-      background: rgba(0, 122, 255, 0.22);
-      color: #38bdf8;
-      border: 1.5px solid rgba(0, 122, 255, 0.5);
-      animation: pulse-badge 1s infinite alternate;
-    }
-
-    .badge-fault {
-      background: rgba(255, 59, 48, 0.25);
-      color: #ff453a;
-      border: 1.5px solid rgba(255, 59, 48, 0.55);
-      box-shadow: 0 0 24px rgba(255, 59, 48, 0.4);
-    }
-
-    @keyframes pulse-badge {
-      0% { opacity: 0.6; transform: scale(0.98); }
-      100% { opacity: 1; transform: scale(1.02); }
-    }
-
-    /* Glass Puck Power Button */
-    .puck-chassis {
-      position: relative;
-      margin-bottom: 20px;
-    }
-
-    .liquid-aura {
-      position: absolute;
-      top: -16px;
-      left: -16px;
-      right: -16px;
-      bottom: -16px;
-      border-radius: 50%;
-      background: radial-gradient(circle, var(--ios-green-glow) 0%, rgba(56, 189, 248, 0.2) 50%, transparent 70%);
-      opacity: 0;
-      filter: blur(20px);
-      transition: opacity 0.5s ease;
-      animation: fluid-pulse 3s infinite ease-in-out;
-    }
-
-    .puck-chassis.is-running .liquid-aura {
-      opacity: 1;
-    }
-
-    .puck-chassis.is-fault .liquid-aura {
-      background: radial-gradient(circle, rgba(255, 59, 48, 0.55) 0%, transparent 70%);
-      opacity: 1;
-      filter: blur(22px);
-    }
-
-    @keyframes fluid-pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-    }
-
-    .liquid-puck-btn {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      background: 
-        radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
-        linear-gradient(145deg, rgba(50, 52, 60, 0.75) 0%, rgba(18, 19, 24, 0.95) 100%);
-      backdrop-filter: blur(30px);
-      border: 1.5px solid rgba(255, 255, 255, 0.22);
-      border-top: 2.5px solid rgba(255, 255, 255, 0.55);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      position: relative;
-      z-index: 2;
-      box-shadow: 
-        0 18px 40px rgba(0, 0, 0, 0.7),
-        inset 0 2px 4px rgba(255, 255, 255, 0.3),
-        inset 0 -4px 8px rgba(0, 0, 0, 0.6);
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s;
-    }
-
-    .liquid-puck-btn:active {
-      transform: scale(0.92);
-    }
-
-    .liquid-puck-btn svg {
-      width: 48px;
-      height: 48px;
-      stroke: #ffffff;
-      transition: stroke 0.3s, transform 0.3s;
-    }
-
-    .liquid-puck-btn span {
-      font-size: 13px;
-      font-weight: 800;
-      margin-top: 8px;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      color: var(--ios-text-secondary);
-      transition: color 0.3s;
-    }
-
-    .puck-chassis.is-running .liquid-puck-btn {
-      background: 
-        radial-gradient(circle at 35% 25%, rgba(52, 199, 89, 0.4) 0%, transparent 60%),
-        linear-gradient(145deg, rgba(20, 55, 30, 0.85) 0%, rgba(10, 28, 15, 0.95) 100%);
-      border-color: rgba(52, 199, 89, 0.6);
-      border-top-color: rgba(134, 239, 172, 0.9);
-    }
-
-    .puck-chassis.is-running .liquid-puck-btn svg {
-      stroke: #4ade80;
-      transform: scale(1.05);
-    }
-
-    .puck-chassis.is-running .liquid-puck-btn span {
-      color: #4ade80;
-    }
-
-    .runtime-counter {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--ios-text-secondary);
-      font-variant-numeric: tabular-nums;
-      margin-top: 2px;
-    }
-
-    /* 2x2 Telemetry Grid */
-    .metrics-2x2 {
+    /* HERO SPLIT SECTION: TANK + POWER CONTROL */
+    .hero-split-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: 120px 1fr;
+      gap: 16px;
+      align-items: center;
     }
 
-    .metric-tile {
+    /* ULTRA-REALISTIC LIQUID GLASS CYLINDER TANK */
+    .tank-chassis {
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      min-height: 106px;
-      padding: 16px;
-    }
-
-    .tile-top {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-    }
-
-    .tile-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--ios-text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .tile-icon svg {
-      width: 16px;
-      height: 16px;
-      stroke: var(--ios-text-tertiary);
-    }
-
-    .tile-val-group {
-      margin-top: 8px;
-    }
-
-    .tile-num {
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: -0.6px;
-      color: #ffffff;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .tile-unit {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--ios-text-secondary);
-      margin-left: 2px;
-    }
-
-    .tile-sub {
-      font-size: 10px;
-      color: var(--ios-text-tertiary);
-      margin-top: 2px;
-      font-weight: 500;
-    }
-
-    /* REAL FLUID LIQUID TANK (NO SPINNING!) */
-    .tank-visual-row {
-      display: flex;
-      align-items: center;
-      gap: 22px;
-      padding: 12px 6px;
+      gap: 8px;
     }
 
     .tank-cylinder {
-      width: 100px;
-      height: 184px;
-      border-radius: 34px;
-      border: 3px solid rgba(255, 255, 255, 0.24);
-      border-top: 3.5px solid rgba(255, 255, 255, 0.55);
-      background: linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(10,15,25,0.7) 18%, rgba(5,10,20,0.8) 82%, rgba(255,255,255,0.12) 100%);
+      width: 104px;
+      height: 196px;
+      border-radius: 36px;
+      border: 3px solid rgba(255, 255, 255, 0.25);
+      border-top: 3.5px solid rgba(255, 255, 255, 0.58);
+      background: linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(10,15,25,0.7) 18%, rgba(5,10,20,0.85) 82%, rgba(255,255,255,0.12) 100%);
       position: relative;
       overflow: hidden;
       box-shadow: 
-        0 18px 36px rgba(0, 0, 0, 0.7),
+        0 18px 36px rgba(0, 0, 0, 0.75),
         inset 0 0 24px rgba(0, 0, 0, 0.85),
-        inset 5px 0 12px rgba(255, 255, 255, 0.18),
-        inset -5px 0 12px rgba(255, 255, 255, 0.1);
+        inset 6px 0 12px rgba(255, 255, 255, 0.2),
+        inset -6px 0 12px rgba(255, 255, 255, 0.1);
       flex-shrink: 0;
     }
 
-    /* Glass specular reflection strip */
+    /* Curved glass lens reflection strip */
     .tank-cylinder::after {
       content: '';
       position: absolute;
@@ -444,9 +298,44 @@
       bottom: 10px;
       width: 6px;
       border-radius: 3px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.25) 100%);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.3) 100%);
       pointer-events: none;
       z-index: 10;
+    }
+
+    /* Capacitive touch foil indicator on the tank wall */
+    .foil-sensor-tape {
+      position: absolute;
+      top: 18px;
+      right: 0;
+      width: 10px;
+      height: 28px;
+      background: linear-gradient(90deg, rgba(217, 119, 6, 0.7), rgba(251, 191, 36, 0.95));
+      border-radius: 4px 0 0 4px;
+      border: 1px solid rgba(254, 240, 138, 0.8);
+      border-right: none;
+      z-index: 9;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+    }
+
+    .tank-scale-lines {
+      position: absolute;
+      left: 6px;
+      top: 24px;
+      bottom: 24px;
+      width: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 7;
+      pointer-events: none;
+    }
+
+    .scale-mark {
+      width: 8px;
+      height: 1.5px;
+      background: rgba(255, 255, 255, 0.35);
+      border-radius: 1px;
     }
 
     /* Inflow Stream from top pipe */
@@ -455,32 +344,30 @@
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 16px;
-      height: 9px;
-      background: rgba(255, 255, 255, 0.35);
-      border-radius: 0 0 5px 5px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-      z-index: 6;
+      width: 18px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.38);
+      border-radius: 0 0 6px 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+      z-index: 8;
     }
 
     .inflow-stream {
       position: absolute;
-      top: 9px;
+      top: 10px;
       left: 50%;
       transform: translateX(-50%);
       width: 5px;
-      height: 70px;
-      background: linear-gradient(180deg, #7dd3fc 0%, #38bdf8 60%, rgba(56, 189, 248, 0.15) 100%);
+      height: 75px;
+      background: linear-gradient(180deg, #7dd3fc 0%, #38bdf8 65%, rgba(56, 189, 248, 0.15) 100%);
       border-radius: 3px;
-      z-index: 4;
+      z-index: 5;
       opacity: 0;
       transition: opacity 0.3s;
       animation: stream-flow 0.35s linear infinite;
     }
 
-    .inflow-stream.active {
-      opacity: 1;
-    }
+    .inflow-stream.active { opacity: 1; }
 
     @keyframes stream-flow {
       0% { transform: translateX(-50%) scaleY(0.96) scaleX(0.9); opacity: 0.75; }
@@ -552,7 +439,7 @@
     .bubble {
       position: absolute;
       bottom: -8px;
-      background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.25) 50%, rgba(56, 189, 248, 0.3) 100%);
+      background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.25) 50%, rgba(56, 189, 248, 0.3) 100%);
       border: 0.5px solid rgba(255, 255, 255, 0.6);
       border-radius: 50%;
       box-shadow: 0 0 4px rgba(255, 255, 255, 0.25), inset -1px -1px 2px rgba(0, 0, 0, 0.2);
@@ -568,103 +455,353 @@
     .b6 { width: 4px; height: 4px; left: 52%; animation: bubble-sway-2 2.5s infinite 1.8s ease-in; }
 
     @keyframes bubble-sway-1 {
-      0% {
-        transform: translateY(0) translateX(0) scale(0.6);
-        opacity: 0;
-      }
-      20% {
-        opacity: 0.9;
-        transform: translateY(-25px) translateX(3px) scale(0.85);
-      }
-      50% {
-        transform: translateY(-65px) translateX(-3px) scale(1);
-      }
-      80% {
-        opacity: 0.85;
-        transform: translateY(-105px) translateX(4px) scale(1.1);
-      }
-      100% {
-        transform: translateY(-135px) translateX(0) scale(1.2);
-        opacity: 0;
-      }
+      0% { transform: translateY(0) translateX(0) scale(0.6); opacity: 0; }
+      20% { opacity: 0.9; transform: translateY(-25px) translateX(3px) scale(0.85); }
+      50% { transform: translateY(-65px) translateX(-3px) scale(1); }
+      80% { opacity: 0.85; transform: translateY(-105px) translateX(4px) scale(1.1); }
+      100% { transform: translateY(-135px) translateX(0) scale(1.2); opacity: 0; }
     }
 
     @keyframes bubble-sway-2 {
-      0% {
-        transform: translateY(0) translateX(0) scale(0.6);
-        opacity: 0;
-      }
-      20% {
-        opacity: 0.9;
-        transform: translateY(-30px) translateX(-4px) scale(0.85);
-      }
-      55% {
-        transform: translateY(-70px) translateX(4px) scale(1);
-      }
-      80% {
-        opacity: 0.85;
-        transform: translateY(-110px) translateX(-3px) scale(1.15);
-      }
-      100% {
-        transform: translateY(-135px) translateX(2px) scale(1.25);
-        opacity: 0;
-      }
+      0% { transform: translateY(0) translateX(0) scale(0.6); opacity: 0; }
+      20% { opacity: 0.9; transform: translateY(-30px) translateX(-4px) scale(0.85); }
+      55% { transform: translateY(-70px) translateX(4px) scale(1); }
+      80% { opacity: 0.85; transform: translateY(-110px) translateX(-3px) scale(1.15); }
+      100% { transform: translateY(-135px) translateX(2px) scale(1.25); opacity: 0; }
     }
 
-    .tank-data-col {
-      flex: 1;
+    .tank-badge-level {
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: baseline;
+      gap: 3px;
+    }
+
+    .tank-badge-level span.pct {
+      font-size: 20px;
+      color: #38bdf8;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tank-badge-sub {
+      font-size: 10px;
+      color: var(--ios-text-secondary);
+      font-weight: 600;
+    }
+
+    /* RIGHT COLUMN: POWER CONTROLS & METRICS */
+    .hero-ctrl-col {
       display: flex;
       flex-direction: column;
+      align-items: center;
       gap: 12px;
     }
 
-    .data-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding-bottom: 6px;
-    }
-
-    .data-row .lbl {
-      font-size: 12px;
-      color: var(--ios-text-secondary);
-      font-weight: 500;
-    }
-
-    .data-row .val {
-      font-size: 16px;
-      font-weight: 800;
-      color: #fff;
-    }
-
-    .contactless-tag {
+    .status-badge-liquid {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      padding: 7px 12px;
-      border-radius: 12px;
+      padding: 6px 14px;
+      border-radius: 100px;
       font-size: 11px;
-      color: #7dd3fc;
       font-weight: 700;
-      margin-top: 4px;
+      letter-spacing: 0.4px;
+      backdrop-filter: blur(15px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      width: 100%;
+      justify-content: center;
     }
 
-    /* Sandbox Action Buttons */
-    .sandbox-container {
+    .badge-idle {
+      background: rgba(142, 142, 147, 0.16);
+      color: #d1d5db;
+      border: 1px solid rgba(142, 142, 147, 0.3);
+    }
+
+    .badge-running {
+      background: rgba(52, 199, 89, 0.22);
+      color: #34c759;
+      border: 1.5px solid rgba(52, 199, 89, 0.55);
+      box-shadow: 0 0 20px rgba(52, 199, 89, 0.35);
+    }
+
+    .badge-starting {
+      background: rgba(0, 122, 255, 0.22);
+      color: #38bdf8;
+      border: 1.5px solid rgba(0, 122, 255, 0.55);
+      animation: pulse-badge 1s infinite alternate;
+    }
+
+    .badge-fault {
+      background: rgba(255, 59, 48, 0.25);
+      color: #ff453a;
+      border: 1.5px solid rgba(255, 59, 48, 0.6);
+      box-shadow: 0 0 24px rgba(255, 59, 48, 0.45);
+    }
+
+    @keyframes pulse-badge {
+      0% { opacity: 0.7; transform: scale(0.98); }
+      100% { opacity: 1; transform: scale(1.02); }
+    }
+
+    /* Glass Puck Power Button */
+    .puck-chassis {
+      position: relative;
+    }
+
+    .liquid-aura {
+      position: absolute;
+      top: -14px;
+      left: -14px;
+      right: -14px;
+      bottom: -14px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--ios-green-glow) 0%, rgba(56, 189, 248, 0.2) 50%, transparent 70%);
+      opacity: 0;
+      filter: blur(20px);
+      transition: opacity 0.5s ease;
+      animation: fluid-pulse 3s infinite ease-in-out;
+    }
+
+    .puck-chassis.is-running .liquid-aura { opacity: 1; }
+    .puck-chassis.is-fault .liquid-aura {
+      background: radial-gradient(circle, var(--ios-red-glow) 0%, transparent 70%);
+      opacity: 1;
+      filter: blur(22px);
+    }
+
+    @keyframes fluid-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .liquid-puck-btn {
+      width: 124px;
+      height: 124px;
+      border-radius: 50%;
+      background: 
+        radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.32) 0%, transparent 50%),
+        linear-gradient(145deg, rgba(50, 52, 60, 0.78) 0%, rgba(16, 18, 24, 0.96) 100%);
+      backdrop-filter: blur(30px);
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
+      border-top: 2.5px solid rgba(255, 255, 255, 0.6);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      z-index: 2;
+      box-shadow: 
+        0 16px 36px rgba(0, 0, 0, 0.75),
+        inset 0 2px 4px rgba(255, 255, 255, 0.35),
+        inset 0 -4px 8px rgba(0, 0, 0, 0.6);
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s;
+    }
+
+    .liquid-puck-btn:active { transform: scale(0.92); }
+
+    .liquid-puck-btn svg {
+      width: 42px;
+      height: 42px;
+      stroke: #ffffff;
+      transition: stroke 0.3s, transform 0.3s;
+    }
+
+    .liquid-puck-btn span {
+      font-size: 12px;
+      font-weight: 800;
+      margin-top: 6px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--ios-text-secondary);
+      transition: color 0.3s;
+    }
+
+    .puck-chassis.is-running .liquid-puck-btn {
+      background: 
+        radial-gradient(circle at 35% 25%, rgba(52, 199, 89, 0.45) 0%, transparent 60%),
+        linear-gradient(145deg, rgba(20, 60, 32, 0.9) 0%, rgba(10, 30, 16, 0.98) 100%);
+      border-color: rgba(52, 199, 89, 0.65);
+      border-top-color: rgba(134, 239, 172, 0.95);
+    }
+
+    .puck-chassis.is-running .liquid-puck-btn svg {
+      stroke: #4ade80;
+      transform: scale(1.05);
+    }
+
+    .puck-chassis.is-running .liquid-puck-btn span { color: #4ade80; }
+
+    .runtime-counter {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ios-text-secondary);
+      font-variant-numeric: tabular-nums;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 4px 10px;
+      border-radius: 100px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* INTERACTIVE LEVEL SLIDER */
+    .slider-card {
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ios-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .range-wrap {
+      position: relative;
+      width: 100%;
+      height: 24px;
+      display: flex;
+      align-items: center;
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.12);
+      outline: none;
+      transition: background 0.2s;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      border: 1.5px solid rgba(56, 189, 248, 0.6);
+      transition: transform 0.1s;
+    }
+
+    input[type=range]::-webkit-slider-thumb:active { transform: scale(1.2); }
+
+    /* 2x2 APPLE HOME TELEMETRY TILES */
+    .metrics-2x2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-top: 10px;
+    }
+
+    .metric-tile {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100px;
+      padding: 14px 16px;
+    }
+
+    .tile-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tile-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ios-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tile-icon-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .tile-icon-badge svg {
+      width: 15px;
+      height: 15px;
+      stroke: var(--ios-cyan);
+    }
+
+    .tile-val-group { margin-top: 6px; }
+
+    .tile-num {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tile-unit {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ios-text-secondary);
+      margin-left: 2px;
+    }
+
+    .tile-sub {
+      font-size: 10px;
+      color: var(--ios-text-tertiary);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    /* SECTION HEADER */
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 6px 0 6px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--ios-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* CLIENT DEMONSTRATION SANDBOX */
+    .sandbox-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
 
     .sandbox-card-btn {
-      background: rgba(255, 255, 255, 0.06);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%), rgba(20, 24, 34, 0.5);
+      backdrop-filter: blur(25px);
       border: 1px solid var(--ios-border);
+      border-top: 1.5px solid rgba(255, 255, 255, 0.28);
       border-radius: 18px;
-      padding: 14px 12px;
+      padding: 12px 14px;
       color: #fff;
       display: flex;
       flex-direction: column;
@@ -672,84 +809,79 @@
       cursor: pointer;
       text-align: left;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
 
     .sandbox-card-btn:active {
       transform: scale(0.96);
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.14);
     }
 
     .sandbox-card-btn .btn-head {
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
 
     .sandbox-card-btn .btn-desc {
       font-size: 10px;
       color: var(--ios-text-secondary);
-      line-height: 1.4;
+      line-height: 1.35;
     }
 
     .sandbox-card-btn.full-span {
       grid-column: span 2;
       background: rgba(52, 199, 89, 0.16);
-      border-color: rgba(52, 199, 89, 0.4);
-      color: #4ade80;
+      border-color: rgba(52, 199, 89, 0.45);
+      text-align: center;
       align-items: center;
-      padding: 15px;
+      padding: 13px;
     }
 
-    /* Tab Switching */
-    .tab-view {
-      display: none;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .tab-view.active {
-      display: flex;
-    }
-
-    /* OTA Progress Bar */
+    /* WIRELESS OTA CLOUD CARD */
     .ota-track {
-      height: 8px;
+      width: 100%;
+      height: 6px;
       background: rgba(255, 255, 255, 0.1);
-      border-radius: 100px;
+      border-radius: 10px;
       overflow: hidden;
-      margin: 14px 0 8px 0;
+      margin: 10px 0 6px 0;
     }
 
     .ota-fill {
-      width: 0%;
       height: 100%;
-      background: linear-gradient(90deg, var(--ios-blue), #38bdf8);
-      border-radius: 100px;
-      transition: width 0.3s;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      border-radius: 10px;
+      transition: width 0.15s ease;
     }
 
-    /* Toast Notification Banner */
+    /* APPLE TOAST BANNER */
     .ios-toast {
       position: fixed;
-      top: 16px;
+      top: 18px;
       left: 50%;
       transform: translateX(-50%) translateY(-100px);
-      background: rgba(30, 32, 40, 0.88);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid var(--ios-border-highlight);
-      padding: 12px 22px;
+      background: rgba(24, 28, 38, 0.92);
+      backdrop-filter: blur(28px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-top: 1px solid rgba(255, 255, 255, 0.5);
       border-radius: 100px;
-      font-size: 13px;
-      font-weight: 600;
+      padding: 10px 20px;
+      font-size: 12px;
+      font-weight: 700;
       color: #fff;
       display: flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+      box-shadow: 0 16px 36px rgba(0,0,0,0.7);
       z-index: 100;
       opacity: 0;
       transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       pointer-events: none;
+      max-width: 90%;
     }
 
     .ios-toast.show {
@@ -760,23 +892,42 @@
 </head>
 <body>
 
+  <!-- Ambient Glowing Background Orbs -->
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+
+  <!-- Apple Toast Dropdown -->
   <div class="ios-toast" id="iosToast">
     <span id="toastIcon">ℹ️</span>
     <span id="toastText">Notification</span>
   </div>
 
   <div class="app-viewport">
-    
-    <!-- Top Header -->
+
+    <!-- Apple Dynamic Island HUD -->
+    <div class="island-container">
+      <div class="dynamic-island" id="dynamicIsland" onclick="onIslandClick()">
+        <span class="island-dot" id="islandDot"></span>
+        <div class="island-text" id="islandText">
+          <span>250m ESP-NOW LR</span>
+          <span class="island-subtag" id="islandSubtag">STANDBY</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header Brand Bar -->
     <div class="header-bar">
       <div>
-        <div class="brand-title">Smart Pump</div>
-        <div class="brand-sub">250m ESP-NOW LR Controller</div>
+        <div class="brand-title">
+          Smart Pump
+          <span class="badge-chip">PRO 250m</span>
+        </div>
+        <div class="brand-sub">Dual ESP32 LR • Single Phase Contactor</div>
       </div>
       <div class="header-actions">
         <div class="liquid-pill active-mode" id="netPill" onclick="toggleNetMode()">
-          <span class="glow-dot"></span>
-          <span id="netText">Local Wi-Fi</span>
+          <span class="island-dot" style="width:6px; height:6px;"></span>
+          <span id="netText">Local Link</span>
         </div>
         <div class="liquid-pill" id="soundPill" onclick="toggleSound()">
           <span id="soundIcon">🔊</span>
@@ -784,109 +935,27 @@
       </div>
     </div>
 
-    <!-- Cupertino Segmented Bar -->
-    <div class="segmented-bar">
-      <div class="segment-btn active" onclick="switchNav('control', this)">Live Control</div>
-      <div class="segment-btn" onclick="switchNav('tank', this)">Water Tank</div>
-      <div class="segment-btn" onclick="switchNav('sandbox', this)">Test Sandbox</div>
-      <div class="segment-btn" onclick="switchNav('ota', this)">Cloud OTA</div>
-    </div>
-
-    <!-- TAB 1: LIVE CONTROL -->
-    <div class="tab-view active" id="view-control">
-      
-      <!-- Liquid Power Card -->
-      <div class="liquid-card hero-center">
-        <div class="status-badge-liquid badge-idle" id="pumpBadge">
-          ● PUMP IDLE / READY
-        </div>
-
-        <div class="puck-chassis" id="puckChassis">
-          <div class="liquid-aura"></div>
-          <button class="liquid-puck-btn" id="puckBtn" onclick="onPuckClick()">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
-              <line x1="12" y1="2" x2="12" y2="12"></line>
-            </svg>
-            <span id="puckBtnLabel">START</span>
-          </button>
-        </div>
-
-        <div class="runtime-counter" id="runtimeClock">Runtime: 00:00:00</div>
-      </div>
-
-      <!-- 2x2 Telemetry Grid -->
-      <div class="metrics-2x2">
-        <div class="liquid-card metric-tile">
-          <div class="tile-top">
-            <span class="tile-title">Motor Current</span>
-            <div class="tile-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-            </div>
-          </div>
-          <div class="tile-val-group">
-            <span class="tile-num" id="currentNum">0.0</span>
-            <span class="tile-unit">A</span>
-            <div class="tile-sub">10.0A Rated Load</div>
-          </div>
-        </div>
-
-        <div class="liquid-card metric-tile">
-          <div class="tile-top">
-            <span class="tile-title">Active Power</span>
-            <div class="tile-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-            </div>
-          </div>
-          <div class="tile-val-group">
-            <span class="tile-num" id="powerNum">0.00</span>
-            <span class="tile-unit">kW</span>
-            <div class="tile-sub">230V AC Single Phase</div>
-          </div>
-        </div>
-
-        <div class="liquid-card metric-tile">
-          <div class="tile-top">
-            <span class="tile-title">Relay 1 (Hold)</span>
-            <div class="tile-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            </div>
-          </div>
-          <div class="tile-val-group">
-            <span class="tile-num" id="relay1Num" style="font-size:18px;">CLOSED</span>
-            <div class="tile-sub">Contactor NC Line</div>
-          </div>
-        </div>
-
-        <div class="liquid-card metric-tile">
-          <div class="tile-top">
-            <span class="tile-title">250m Radio</span>
-            <div class="tile-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
-            </div>
-          </div>
-          <div class="tile-val-group">
-            <span class="tile-num" id="radioNum">-62</span>
-            <span class="tile-unit">dBm</span>
-            <div class="tile-sub">ESP-NOW LR Link</div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- TAB 2: WATER TANK VISUALIZER -->
-    <div class="tab-view" id="view-tank">
-      <div class="liquid-card">
-        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 14px;">Overhead Water Tank</h3>
+    <!-- PRIMARY HERO CARD: WATER TANK + POWER PUCK -->
+    <div class="liquid-card">
+      <div class="hero-split-grid">
         
-        <div class="tank-visual-row">
+        <!-- LEFT: LIQUID TANK VESSEL -->
+        <div class="tank-chassis">
           <div class="tank-cylinder">
             <div class="inflow-pipe"></div>
             <div class="inflow-stream" id="inflowStream"></div>
+            <div class="foil-sensor-tape" title="Contactless Aluminum Foil Capacitive Sensor"></div>
+
+            <div class="tank-scale-lines">
+              <div class="scale-mark"></div>
+              <div class="scale-mark"></div>
+              <div class="scale-mark"></div>
+              <div class="scale-mark"></div>
+              <div class="scale-mark"></div>
+            </div>
 
             <div class="liquid-body" id="liquidBody">
-              <!-- Horizontal sliding wave SVG (Mathematically Seamless Sine Waves, Zero Spinning) -->
+              <!-- Dual Horizontal Sine Waves (Translation Only, No Spinning) -->
               <div class="wave-svg-box">
                 <svg class="liquid-wave-strip" viewBox="0 0 400 30" preserveAspectRatio="none">
                   <path class="wave-back" d="M0,10 C35,18 65,18 100,10 C135,2 165,2 200,10 C235,18 265,18 300,10 C335,2 365,2 400,10 L400,30 L0,30 Z"></path>
@@ -894,7 +963,7 @@
                 </svg>
               </div>
               <div class="liquid-deep">
-                <!-- Floating rising air bubbles with natural sway -->
+                <!-- 6 Swaying Rising Air Bubbles -->
                 <div class="bubble b1"></div>
                 <div class="bubble b2"></div>
                 <div class="bubble b3"></div>
@@ -905,109 +974,163 @@
             </div>
           </div>
 
-          <div class="tank-data-col">
-            <div class="data-row">
-              <span class="lbl">Water Level</span>
-              <span class="val" id="tankLevelPct">65%</span>
-            </div>
-            <div class="data-row">
-              <span class="lbl">Liquid Depth</span>
-              <span class="val" id="tankDepthFt">3.25 ft / 5.0 ft</span>
-            </div>
-            <div class="data-row">
-              <span class="lbl">Est. Time to Full</span>
-              <span class="val" id="tankEstMins">~14 Mins</span>
-            </div>
-            <div class="contactless-tag" id="foilTag">
-              <span>⚡</span> Contactless Foil: OK
-            </div>
+          <div class="tank-badge-level">
+            <span class="pct" id="tankLevelPct">65%</span>
+            <span class="tank-badge-sub" id="tankDepthFt">3.3 ft</span>
+          </div>
+          <div class="tank-badge-sub" id="tankEstMins">~14 Mins to Full</div>
+        </div>
+
+        <!-- RIGHT: PUMP CONTROL PUCK -->
+        <div class="hero-ctrl-col">
+          <div class="status-badge-liquid badge-idle" id="pumpBadge">
+            ● STANDBY / READY
+          </div>
+
+          <div class="puck-chassis" id="puckChassis">
+            <div class="liquid-aura"></div>
+            <button class="liquid-puck-btn" id="puckBtn" onclick="onPuckClick()">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                <line x1="12" y1="2" x2="12" y2="12"></line>
+              </svg>
+              <span id="puckBtnLabel">START</span>
+            </button>
+          </div>
+
+          <div class="runtime-counter" id="runtimeClock">Runtime: 00:00:00</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TANK LEVEL ADJUSTMENT SLIDER -->
+    <div class="liquid-card slider-card">
+      <div class="slider-header">
+        <span>Interactive Water Level</span>
+        <span style="color:#38bdf8;" id="sliderValDisplay">65% (Tap/Drag to simulate)</span>
+      </div>
+      <div class="range-wrap">
+        <input type="range" id="tankSlider" min="0" max="100" value="65" oninput="onSliderChange(this.value)">
+      </div>
+    </div>
+
+    <!-- 2x2 TELEMETRY GRID -->
+    <div class="metrics-2x2">
+      <div class="liquid-card metric-tile">
+        <div class="tile-top">
+          <span class="tile-title">Motor Load</span>
+          <div class="tile-icon-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
           </div>
         </div>
+        <div class="tile-val-group">
+          <span class="tile-num" id="currentNum">0.0</span>
+          <span class="tile-unit">A</span>
+          <div class="tile-sub">10.0A Rated Induction</div>
+        </div>
       </div>
 
-      <div class="liquid-card">
-        <h4 style="font-size: 13px; font-weight: 700; color: var(--ios-text-secondary); margin-bottom: 8px;">Non-Contact Capacitive Sensing</h4>
-        <p style="font-size: 12px; color: var(--ios-text-secondary); line-height: 1.5;">
-          A single aluminum foil patch is taped to the <strong>outside</strong> of the plastic tank wall. ESP32 monitors touch capacitance on GPIO 4 Touch0. When water rises to the foil level, the dielectric change trips an immediate cutoff with zero corrosion or tank drilling.
-        </p>
+      <div class="liquid-card metric-tile">
+        <div class="tile-top">
+          <span class="tile-title">Power Draw</span>
+          <div class="tile-icon-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+        </div>
+        <div class="tile-val-group">
+          <span class="tile-num" id="powerNum">0.00</span>
+          <span class="tile-unit">kW</span>
+          <div class="tile-sub">230V AC Single-Phase</div>
+        </div>
+      </div>
+
+      <div class="liquid-card metric-tile">
+        <div class="tile-top">
+          <span class="tile-title">Contactor NC</span>
+          <div class="tile-icon-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </div>
+        </div>
+        <div class="tile-val-group">
+          <span class="tile-num" id="relay1Num" style="font-size:18px;">CLOSED</span>
+          <div class="tile-sub">Holding Loop Ready</div>
+        </div>
+      </div>
+
+      <div class="liquid-card metric-tile">
+        <div class="tile-top">
+          <span class="tile-title">250m ESP-NOW</span>
+          <div class="tile-icon-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+          </div>
+        </div>
+        <div class="tile-val-group">
+          <span class="tile-num" id="radioNum">-62</span>
+          <span class="tile-unit">dBm</span>
+          <div class="tile-sub">LR Link Margin +18dB</div>
+        </div>
       </div>
     </div>
 
-    <!-- TAB 3: TEST SANDBOX (CLIENT DEMO SCENARIOS) -->
-    <div class="tab-view" id="view-sandbox">
-      <div class="liquid-card">
-        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Failsafe Simulation Sandbox</h3>
-        <p style="font-size: 12px; color: var(--ios-text-secondary); margin-bottom: 14px;">
-          Click any scenario to demonstrate the hardware safety cutoffs to your client:
-        </p>
-
-        <div class="sandbox-container">
-          <button class="sandbox-card-btn" onclick="triggerDryRun()">
-            <span class="btn-head">⚠️ Borewell Dry-Run</span>
-            <span class="btn-desc">Current drops &lt; 4.0A &rarr; Auto cutoff after 8s</span>
-          </button>
-
-          <button class="sandbox-card-btn" onclick="triggerMotorJam()">
-            <span class="btn-head">🚨 Motor Jam / Overload</span>
-            <span class="btn-desc">Current surges &gt; 16A &rarr; Instant trip &lt; 100ms</span>
-          </button>
-
-          <button class="sandbox-card-btn" onclick="triggerOverflow()">
-            <span class="btn-head">💧 Tank Full Overflow</span>
-            <span class="btn-desc">Foil trips &rarr; Victory Fanfare &amp; auto-stop</span>
-          </button>
-
-          <button class="sandbox-card-btn" onclick="triggerWatchdog()">
-            <span class="btn-head">📡 Lost 250m Link</span>
-            <span class="btn-desc">Heartbeat timeout &rarr; 3-min Watchdog auto-stop</span>
-          </button>
-
-          <button class="sandbox-card-btn full-span" onclick="triggerReset()">
-            <span style="font-size:14px; font-weight:800;">🔄 Reset System to Standby</span>
-          </button>
-        </div>
+    <!-- CLIENT DEMONSTRATION SECTION -->
+    <div class="section-head">
+      <div class="section-title">
+        <span>⚡</span> Client Safety Demonstrations
       </div>
     </div>
 
-    <!-- TAB 4: CLOUD & REMOTE OTA -->
-    <div class="tab-view" id="view-ota">
-      <div class="liquid-card">
-        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Cloud &amp; Wireless OTA</h3>
-        <p style="font-size: 12px; color: var(--ios-text-secondary); margin-bottom: 16px;">
-          Zero-subscription remote management and wireless firmware updates from anywhere.
-        </p>
+    <div class="sandbox-container">
+      <button class="sandbox-card-btn" onclick="triggerDryRun()">
+        <span class="btn-head">⚠️ Borewell Dry-Run</span>
+        <span class="btn-desc">Current drops &lt; 4.0A &rarr; 8s auto-cutoff protection</span>
+      </button>
 
-        <div class="data-row">
-          <span class="lbl">Cloud Broker</span>
-          <span class="val" style="font-size:13px; color: #4ade80;">HiveMQ TLS (Free Tier)</span>
-        </div>
-        <div class="data-row" style="margin-top:8px;">
-          <span class="lbl">Installed Firmware</span>
-          <span class="val" style="font-size:13px;">v2.4.0-release</span>
-        </div>
-        <div class="data-row" style="margin-top:8px;">
-          <span class="lbl">Latest on GitHub</span>
-          <span class="val" style="font-size:13px; color: #38bdf8;">v2.5.0-ready</span>
-        </div>
+      <button class="sandbox-card-btn" onclick="triggerMotorJam()">
+        <span class="btn-head">🚨 Overload / Jam</span>
+        <span class="btn-desc">Current surges &gt; 16A &rarr; Instant trip &lt; 100ms</span>
+      </button>
 
-        <div class="ota-track">
-          <div class="ota-fill" id="otaBar"></div>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--ios-text-secondary);">
-          <span id="otaStatusLbl">Ready for Cloud Pull OTA</span>
-          <span id="otaPctLbl">0%</span>
-        </div>
+      <button class="sandbox-card-btn" onclick="triggerOverflow()">
+        <span class="btn-head">💧 Tank Overflow</span>
+        <span class="btn-desc">Foil trips &rarr; Victory Fanfare &amp; auto-stop</span>
+      </button>
 
-        <button class="sandbox-card-btn full-span" style="margin-top:14px; background: rgba(0, 122, 255, 0.22); border-color: rgba(0, 122, 255, 0.45); color: #38bdf8;" onclick="triggerOTA()">
-          <span style="font-size:13px; font-weight:700;">⚡ Flash Firmware v2.5.0 Remotely</span>
+      <button class="sandbox-card-btn" onclick="triggerWatchdog()">
+        <span class="btn-head">📡 250m Link Loss</span>
+        <span class="btn-desc">Heartbeat timeout &rarr; 3-min Watchdog failsafe</span>
+      </button>
+
+      <button class="sandbox-card-btn full-span" onclick="triggerReset()">
+        <span style="font-size:13px; font-weight:800; color:#4ade80;">🔄 Reset All Systems to Standby</span>
+      </button>
+    </div>
+
+    <!-- WIRELESS OTA CLOUD CARD -->
+    <div class="liquid-card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size:13px; font-weight:800;">Cloud &amp; Wireless OTA</div>
+          <div style="font-size:11px; color:var(--ios-text-secondary);">HiveMQ TLS Free Tier &bull; v2.4.0 Active</div>
+        </div>
+        <button class="liquid-pill" style="background:rgba(56,189,248,0.18); border-color:rgba(56,189,248,0.45); color:#38bdf8;" onclick="triggerOTA()">
+          ⚡ Flash v2.5.0
         </button>
+      </div>
+
+      <div class="ota-track">
+        <div class="ota-fill" id="otaBar"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--ios-text-tertiary);">
+        <span id="otaStatusLbl">Standby: v2.5.0 ready on GitHub Releases</span>
+        <span id="otaPctLbl">0%</span>
       </div>
     </div>
 
   </div>
 
   <script>
-    // State
+    // State Variables
     let isRunning = false;
     let isStarting = false;
     let currentFault = null;
@@ -1019,7 +1142,7 @@
     let soundOn = true;
     let isLocal = true;
 
-    // Web Audio Synthesizer (Genuine Passive Buzzer Melodies)
+    // Web Audio Synthesizer (Realistic Apple Haptics + Melodies)
     let audioContext = null;
 
     function getAudio() {
@@ -1032,16 +1155,34 @@
       return audioContext;
     }
 
-    function soundBeep(freq, ms, delay = 0) {
+    // Tactile iPhone Taptic Engine click sound
+    function soundHaptic() {
+      if (!soundOn) return;
+      try {
+        const ctx = getAudio();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(140, ctx.currentTime);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.04);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.04);
+      } catch (e) {}
+    }
+
+    function soundBeep(freq, ms, delay = 0, type = 'sine', vol = 0.09) {
       if (!soundOn) return;
       try {
         const ctx = getAudio();
         setTimeout(() => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
-          osc.type = 'square';
+          osc.type = type;
           osc.frequency.setValueAtTime(freq, ctx.currentTime);
-          gain.gain.setValueAtTime(0.08, ctx.currentTime);
+          gain.gain.setValueAtTime(vol, ctx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + (ms / 1000));
           osc.connect(gain);
           gain.connect(ctx.destination);
@@ -1052,83 +1193,115 @@
     }
 
     function chimeStart() {
-      soundBeep(523, 100, 0);
-      soundBeep(659, 100, 120);
-      soundBeep(784, 120, 240);
-      soundBeep(1046, 250, 380);
+      soundBeep(523, 80, 0, 'sine', 0.1);
+      soundBeep(659, 80, 100, 'sine', 0.1);
+      soundBeep(784, 100, 200, 'sine', 0.12);
+      soundBeep(1046, 220, 320, 'sine', 0.15);
     }
 
     function chimeStop() {
-      soundBeep(784, 120, 0);
-      soundBeep(659, 120, 140);
-      soundBeep(523, 250, 280);
+      soundBeep(784, 90, 0, 'sine', 0.1);
+      soundBeep(659, 90, 110, 'sine', 0.1);
+      soundBeep(523, 200, 220, 'sine', 0.12);
     }
 
     function chimeFanfare() {
-      soundBeep(523, 120, 0);
-      soundBeep(659, 120, 140);
-      soundBeep(784, 120, 280);
-      soundBeep(1046, 350, 420);
-      soundBeep(784, 120, 800);
-      soundBeep(1046, 400, 940);
+      soundBeep(523, 100, 0, 'sine', 0.12);
+      soundBeep(659, 100, 120, 'sine', 0.12);
+      soundBeep(784, 100, 240, 'sine', 0.14);
+      soundBeep(1046, 300, 360, 'sine', 0.18);
+      soundBeep(784, 100, 700, 'sine', 0.12);
+      soundBeep(1046, 400, 820, 'sine', 0.18);
     }
 
     function chimeAlarm() {
-      for (let i = 0; i < 5; i++) {
-        soundBeep(2200, 80, i * 140);
+      for (let i = 0; i < 4; i++) {
+        soundBeep(2100, 70, i * 130, 'square', 0.08);
       }
     }
 
-    // Toast
+    // Apple Toast Notification
     function showToast(icon, text) {
       const toast = document.getElementById('iosToast');
       document.getElementById('toastIcon').innerText = icon;
       document.getElementById('toastText').innerText = text;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-
-    // Tab Navigation
-    function switchNav(id, btn) {
-      document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
-      document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('view-' + id).classList.add('active');
-      btn.classList.add('active');
-    }
-
-    // Toggle Network Mode
-    function toggleNetMode() {
-      isLocal = !isLocal;
-      const pill = document.getElementById('netPill');
-      const text = document.getElementById('netText');
-      if (isLocal) {
-        pill.className = 'liquid-pill active-mode';
-        text.innerText = 'Local Wi-Fi';
-        showToast('📶', 'Connected locally to ESP32 (10ms)');
-      } else {
-        pill.className = 'liquid-pill';
-        pill.style.background = 'rgba(0, 122, 255, 0.2)';
-        pill.style.borderColor = 'rgba(0, 122, 255, 0.4)';
-        pill.style.color = '#38bdf8';
-        text.innerText = 'Cloud 4G/5G';
-        showToast('☁️', 'Connected via Free HiveMQ Cloud MQTT Broker');
-      }
+      setTimeout(() => toast.classList.remove('show'), 3200);
     }
 
     // Toggle Sound
     function toggleSound() {
       soundOn = !soundOn;
       document.getElementById('soundIcon').innerText = soundOn ? '🔊' : '🔇';
-      showToast(soundOn ? '🔊' : '🔇', soundOn ? 'Buzzer Melodies Enabled' : 'Buzzer Muted');
+      if (soundOn) {
+        soundHaptic();
+        showToast('🔊', 'Web Audio Synthesizer Enabled');
+      } else {
+        showToast('🔇', 'Audio Muted');
+      }
     }
 
-    // Puck Button Click
-    function onPuckClick() {
+    // Toggle Network Mode
+    function toggleNetMode() {
+      soundHaptic();
+      isLocal = !isLocal;
+      const pill = document.getElementById('netPill');
+      const text = document.getElementById('netText');
+      if (isLocal) {
+        pill.className = 'liquid-pill active-mode';
+        text.innerText = 'Local Link';
+        showToast('📶', 'Connected directly via 250m ESP-NOW LR');
+      } else {
+        pill.className = 'liquid-pill';
+        text.innerText = 'Cloud MQTT';
+        showToast('☁️', 'Routed via HiveMQ Cloud (Internet)');
+      }
+    }
+
+    // Dynamic Island Interaction
+    function onIslandClick() {
+      soundHaptic();
       if (currentFault) {
-        showToast('⚠️', 'Clear active fault in Sandbox before starting');
+        showToast('🚨', `Safety Cutoff Active: ${currentFault}. Reset system below.`);
+      } else if (isRunning) {
+        showToast('💧', `Motor running at ${currentAmps.toFixed(1)}A &bull; Tank at ${Math.round(currentTankLevel)}%`);
+      } else {
+        showToast('🟢', 'Dual ESP32 Link: -62 dBm LR Margin (+18dB Signal)');
+      }
+    }
+
+    function updateDynamicIsland(status, mode = 'idle') {
+      const island = document.getElementById('dynamicIsland');
+      const dot = document.getElementById('islandDot');
+      const text = document.getElementById('islandText');
+
+      if (mode === 'running') {
+        island.className = 'dynamic-island is-expanded';
+        dot.className = 'island-dot';
+        text.innerHTML = `<span>💧 Pumping</span> <span class="island-subtag">${currentAmps.toFixed(1)}A &bull; ${Math.round(currentTankLevel)}%</span>`;
+      } else if (mode === 'starting') {
+        island.className = 'dynamic-island is-expanded';
+        dot.className = 'island-dot blue';
+        text.innerHTML = `<span>⚡ Starting</span> <span class="island-subtag">1.8s Pulse</span>`;
+      } else if (mode === 'fault') {
+        island.className = 'dynamic-island is-fault';
+        dot.className = 'island-dot red';
+        text.innerHTML = `<span>🚨 TRIP</span> <span class="island-subtag">${status}</span>`;
+      } else {
+        island.className = 'dynamic-island';
+        dot.className = 'island-dot';
+        text.innerHTML = `<span>250m ESP-NOW LR</span> <span class="island-subtag">STANDBY</span>`;
+      }
+    }
+
+    // Power Puck Click
+    function onPuckClick() {
+      soundHaptic();
+      if (currentFault) {
+        chimeAlarm();
+        showToast('🚨', `Cannot Start: ${currentFault} trip active! Tap Reset first.`);
         return;
       }
-
       if (isRunning || isStarting) {
         stopPump();
       } else {
@@ -1137,26 +1310,23 @@
     }
 
     function startPump() {
-      if (currentTankLevel >= 100) {
-        showToast('💧', 'Tank is already 100% Full!');
-        return;
-      }
-
       isStarting = true;
       chimeStart();
+      updateDynamicIsland('Starting...', 'starting');
+
       showToast('⚡', 'Relay 2 Start Pulse Fired (1.8s)');
 
       const badge = document.getElementById('pumpBadge');
       badge.className = 'status-badge-liquid badge-starting';
       badge.innerText = '● STARTING (1.8s PULSE)...';
 
-      currentAmps = 28.4; // Inrush current
+      currentAmps = 28.4; // Initial inrush
       renderMetrics();
 
       setTimeout(() => {
         isStarting = false;
         isRunning = true;
-        currentAmps = 10.2; // Normal 10A induction pump load
+        currentAmps = 10.2; // Continuous 10A induction pump load
         badge.className = 'status-badge-liquid badge-running';
         badge.innerText = '● 10A MOTOR RUNNING';
 
@@ -1164,8 +1334,9 @@
         document.getElementById('puckBtnLabel').innerText = 'STOP';
         document.getElementById('inflowStream').classList.add('active');
 
+        updateDynamicIsland('Running', 'running');
         startTimers();
-        showToast('✅', 'Contactor Latched! Motor Running at 10.2A');
+        showToast('✅', 'Contactor Latched! Motor running smoothly at 10.2A');
       }, 1800);
     }
 
@@ -1177,12 +1348,13 @@
 
       const badge = document.getElementById('pumpBadge');
       badge.className = 'status-badge-liquid badge-idle';
-      badge.innerText = '● PUMP IDLE / READY';
+      badge.innerText = '● STANDBY / READY';
 
       document.getElementById('puckChassis').className = 'puck-chassis';
       document.getElementById('puckBtnLabel').innerText = 'START';
       document.getElementById('inflowStream').classList.remove('active');
 
+      if (!currentFault) updateDynamicIsland('Standby', 'idle');
       stopTimers();
       renderMetrics();
       showToast('⏹', 'Relay 1 Opened: Contactor de-energized');
@@ -1199,8 +1371,9 @@
         document.getElementById('runtimeClock').innerText = `Runtime: ${h}:${m}:${s}`;
 
         if (currentTankLevel < 100) {
-          currentTankLevel = Math.min(100, currentTankLevel + 0.25);
+          currentTankLevel = Math.min(100, currentTankLevel + 0.3);
           renderTank();
+          updateDynamicIsland('Running', 'running');
         } else {
           triggerOverflow();
         }
@@ -1230,14 +1403,25 @@
       document.getElementById('liquidBody').style.height = currentTankLevel + '%';
       document.getElementById('tankLevelPct').innerText = Math.round(currentTankLevel) + '%';
       const depth = (currentTankLevel * 5.0 / 100).toFixed(1);
-      document.getElementById('tankDepthFt').innerText = `${depth} ft / 5.0 ft`;
+      document.getElementById('tankDepthFt').innerText = `${depth} ft`;
 
       const mins = Math.max(0, Math.round((100 - currentTankLevel) * 0.4));
-      document.getElementById('tankEstMins').innerText = isRunning ? `~${mins} Mins` : 'Paused';
+      document.getElementById('tankEstMins').innerText = isRunning ? `~${mins} Mins to Full` : 'Pumping Paused';
+      document.getElementById('tankSlider').value = Math.round(currentTankLevel);
+      document.getElementById('sliderValDisplay').innerText = `${Math.round(currentTankLevel)}% (Tap/Drag to simulate)`;
     }
 
-    // Sandbox Triggers
+    function onSliderChange(val) {
+      currentTankLevel = parseFloat(val);
+      renderTank();
+      if (currentTankLevel >= 100) {
+        triggerOverflow();
+      }
+    }
+
+    // Sandbox Demonstration Scenarios
     function triggerDryRun() {
+      soundHaptic();
       if (!isRunning) startPump();
 
       setTimeout(() => {
@@ -1248,6 +1432,7 @@
         const badge = document.getElementById('pumpBadge');
         badge.className = 'status-badge-liquid badge-starting';
         badge.innerText = '⚠️ DRY-RUN DETECTED (8s TRIP)...';
+        updateDynamicIsland('Dry-Run (<4A)', 'fault');
 
         setTimeout(() => {
           currentFault = 'DRY_RUN';
@@ -1257,16 +1442,18 @@
           badge.className = 'status-badge-liquid badge-fault';
           badge.innerText = '🚨 FAULT: BOREWELL DRY-RUN TRIP';
           document.getElementById('puckChassis').className = 'puck-chassis is-fault';
+          updateDynamicIsland('Borewell Dry-Run', 'fault');
           showToast('🚨', 'Dry Run Protection Cutoff! Motor saved from burnout');
-        }, 3000);
-      }, 2000);
+        }, 2500);
+      }, 1500);
     }
 
     function triggerMotorJam() {
+      soundHaptic();
       if (!isRunning) startPump();
 
       setTimeout(() => {
-        showToast('🚨', 'Mechanical Jam Simulated! Current spiking > 16A');
+        showToast('🚨', 'Motor Jam Simulated! Current spiking > 16A');
         currentAmps = 18.2;
         renderMetrics();
 
@@ -1278,25 +1465,22 @@
         badge.className = 'status-badge-liquid badge-fault';
         badge.innerText = '🚨 FAULT: MOTOR OVERLOAD TRIP (18.2A)';
         document.getElementById('puckChassis').className = 'puck-chassis is-fault';
-      }, 1500);
+        updateDynamicIsland('Motor Jam (>16A)', 'fault');
+      }, 1200);
     }
 
     function triggerOverflow() {
       currentTankLevel = 100;
       renderTank();
 
-      const tag = document.getElementById('foilTag');
-      tag.style.background = 'rgba(52, 199, 89, 0.22)';
-      tag.style.borderColor = 'rgba(52, 199, 89, 0.55)';
-      tag.style.color = '#4ade80';
-      tag.innerHTML = '<span>🏆</span> Contactless Foil: TANK 100% FULL';
-
       if (isRunning) stopPump();
       chimeFanfare();
-      showToast('🏆', 'Victory Fanfare! Tank full, pump auto-stopped');
+      updateDynamicIsland('Tank Full 100%', 'idle');
+      showToast('🏆', 'Victory Fanfare! Foil sensor tripped, pump auto-stopped');
     }
 
     function triggerWatchdog() {
+      soundHaptic();
       showToast('📡', 'Simulating 250m link loss...');
       document.getElementById('radioNum').innerText = '--';
       setTimeout(() => {
@@ -1307,26 +1491,25 @@
         badge.className = 'status-badge-liquid badge-fault';
         badge.innerText = '🚨 FAULT: 3-MIN WATCHDOG TIMEOUT';
         document.getElementById('puckChassis').className = 'puck-chassis is-fault';
-      }, 2000);
+        updateDynamicIsland('250m Lost', 'fault');
+      }, 1500);
     }
 
     function triggerReset() {
+      soundHaptic();
       currentFault = null;
       stopPump();
       currentTankLevel = 65;
       runSeconds = 0;
       document.getElementById('runtimeClock').innerText = 'Runtime: 00:00:00';
       document.getElementById('radioNum').innerText = '-62';
-      const tag = document.getElementById('foilTag');
-      tag.style.background = 'rgba(56, 189, 248, 0.12)';
-      tag.style.borderColor = 'rgba(56, 189, 248, 0.35)';
-      tag.style.color = '#7dd3fc';
-      tag.innerHTML = '<span>⚡</span> Contactless Foil: OK';
+      updateDynamicIsland('Standby', 'idle');
       renderTank();
-      showToast('🔄', 'System reset to normal standby');
+      showToast('🔄', 'All systems reset to normal standby');
     }
 
     function triggerOTA() {
+      soundHaptic();
       const fill = document.getElementById('otaBar');
       const statusText = document.getElementById('otaStatusLbl');
       const pctText = document.getElementById('otaPctLbl');
@@ -1345,13 +1528,15 @@
             statusText.innerText = 'Rebooting ESP32...';
             setTimeout(() => {
               statusText.innerText = '✅ Updated to v2.5.0 (Online)';
+              chimeStart();
               showToast('⚡', 'Firmware v2.5.0 installed wirelessly via Cloud OTA!');
-            }, 1200);
-          }, 1000);
+            }, 1000);
+          }, 800);
         }
-      }, 100);
+      }, 70);
     }
 
+    // Initial Render
     renderTank();
     renderMetrics();
   </script>
