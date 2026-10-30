@@ -5,32 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Smart Pump 250m Controller</title>
+  <title>Smart Pump</title>
   <style>
     :root {
-      --ios-bg: #000000;
-      --ios-card: rgba(28, 28, 30, 0.65);
-      --ios-card-solid: #1c1c1e;
-      --ios-card-active: rgba(44, 44, 46, 0.75);
-      --ios-border: rgba(255, 255, 255, 0.12);
-      --ios-border-focus: rgba(255, 255, 255, 0.25);
-      --ios-text: #ffffff;
-      --ios-text-secondary: rgba(235, 235, 245, 0.6);
-      --ios-text-tertiary: rgba(235, 235, 245, 0.38);
-      --ios-blue: #007aff;
+      --ios-bg: #030712;
+      --ios-card: rgba(22, 27, 34, 0.65);
+      --ios-card-sheen: rgba(255, 255, 255, 0.08);
+      --ios-border: rgba(255, 255, 255, 0.16);
+      --ios-border-highlight: rgba(255, 255, 255, 0.38);
+      --ios-text: #f9fafb;
+      --ios-text-secondary: rgba(243, 244, 246, 0.65);
+      --ios-text-tertiary: rgba(243, 244, 246, 0.4);
       --ios-green: #34c759;
-      --ios-orange: #ff9500;
+      --ios-green-glow: rgba(52, 199, 89, 0.45);
+      --ios-blue: #007aff;
+      --ios-cyan: #38bdf8;
       --ios-red: #ff3b30;
-      --ios-teal: #30b0c7;
-      --ios-indigo: #5856d6;
-      --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      --ios-orange: #ff9500;
+      --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: var(--font-family);
+      font-family: var(--font-stack);
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
@@ -42,15 +41,15 @@
       display: flex;
       justify-content: center;
       background-image: 
-        radial-gradient(at 10% 20%, rgba(0, 122, 255, 0.18) 0px, transparent 50%),
-        radial-gradient(at 90% 80%, rgba(52, 199, 89, 0.12) 0px, transparent 50%),
-        radial-gradient(at 50% 50%, rgba(88, 86, 214, 0.10) 0px, transparent 60%);
+        radial-gradient(circle at 15% 15%, rgba(0, 122, 255, 0.22) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(52, 199, 89, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 50% 45%, rgba(99, 102, 241, 0.12) 0%, transparent 60%);
       background-attachment: fixed;
-      padding: 16px 12px 60px 12px;
+      padding: 18px 14px 60px 14px;
       overflow-x: hidden;
     }
 
-    .app-container {
+    .app-viewport {
       width: 100%;
       max-width: 440px;
       display: flex;
@@ -58,28 +57,33 @@
       gap: 16px;
     }
 
-    /* iOS Glassmorphism Card Base */
-    .glass-card {
-      background: var(--ios-card);
-      backdrop-filter: blur(28px) saturate(190%);
-      -webkit-backdrop-filter: blur(28px) saturate(190%);
+    /* True Apple Liquid Glass Cards */
+    .liquid-card {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 100%), var(--ios-card);
+      backdrop-filter: blur(32px) saturate(200%);
+      -webkit-backdrop-filter: blur(32px) saturate(200%);
       border: 1px solid var(--ios-border);
-      border-radius: 22px;
-      padding: 18px;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+      border-top: 1.5px solid var(--ios-border-highlight);
+      border-radius: 26px;
+      padding: 20px;
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.55),
+        inset 0 1px 1px rgba(255, 255, 255, 0.35),
+        inset 0 -1px 1px rgba(0, 0, 0, 0.5);
       position: relative;
       overflow: hidden;
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
     }
 
-    .glass-card::before {
-      content: "";
+    .liquid-card::after {
+      content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.06), transparent 50%);
+      pointer-events: none;
     }
 
     /* Header Bar */
@@ -90,159 +94,200 @@
       padding: 4px 6px;
     }
 
-    .app-title-group h1 {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: -0.4px;
+    .brand-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      background: linear-gradient(180deg, #ffffff 30%, rgba(255, 255, 255, 0.7) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .app-title-group p {
+    .brand-sub {
       font-size: 11px;
       color: var(--ios-text-secondary);
-      font-weight: 500;
+      font-weight: 600;
+      letter-spacing: 0.2px;
     }
 
-    .header-pills {
+    .header-actions {
       display: flex;
       gap: 8px;
       align-items: center;
     }
 
-    .pill-badge {
+    .liquid-pill {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 5px 10px;
+      gap: 6px;
+      padding: 6px 12px;
       border-radius: 100px;
       font-size: 11px;
       font-weight: 600;
       background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
       border: 1px solid var(--ios-border);
+      border-top: 1px solid rgba(255, 255, 255, 0.25);
       color: var(--ios-text-secondary);
       cursor: pointer;
-      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .pill-badge.active-green {
-      background: rgba(52, 199, 89, 0.16);
-      border-color: rgba(52, 199, 89, 0.35);
+    .liquid-pill:active {
+      transform: scale(0.95);
+    }
+
+    .liquid-pill.active-mode {
+      background: rgba(52, 199, 89, 0.18);
+      border-color: rgba(52, 199, 89, 0.45);
       color: #4ade80;
+      box-shadow: 0 0 16px rgba(52, 199, 89, 0.25);
     }
 
-    .status-dot {
+    .glow-dot {
       width: 7px;
       height: 7px;
       border-radius: 50%;
       background: #4ade80;
       box-shadow: 0 0 8px #4ade80;
-      animation: pulse-dot 2s infinite ease-in-out;
+      animation: pulse-ring 2s infinite ease-in-out;
     }
 
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
+    @keyframes pulse-ring {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.8); opacity: 0.4; }
     }
 
-    /* Segmented Control Bar */
-    .segmented-control {
+    /* Segmented Navigation */
+    .segmented-bar {
       display: flex;
-      background: rgba(118, 118, 128, 0.24);
-      padding: 3px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(30, 30, 35, 0.6);
+      backdrop-filter: blur(25px);
+      padding: 4px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .segment-tab {
+    .segment-btn {
       flex: 1;
       padding: 8px 4px;
       text-align: center;
       font-size: 12px;
       font-weight: 600;
       color: var(--ios-text-secondary);
-      border-radius: 9px;
+      border-radius: 10px;
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .segment-tab.active {
-      background: rgba(255, 255, 255, 0.18);
-      color: #ffffff;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    .segment-btn.active {
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+      border: 1px solid rgba(255, 255, 255, 0.18);
     }
 
-    /* Hero Power Card */
-    .hero-card {
+    /* Main Hero Control Card */
+    .hero-center {
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      padding: 30px 20px 24px 20px;
+      padding: 26px 18px 20px 18px;
     }
 
-    .status-chip {
+    .status-badge-liquid {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
+      gap: 7px;
+      padding: 7px 16px;
       border-radius: 100px;
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.3px;
-      margin-bottom: 24px;
-      transition: all 0.3s;
-    }
-
-    .chip-idle { background: rgba(142, 142, 147, 0.18); color: #aeaeb2; border: 1px solid rgba(142, 142, 147, 0.25); }
-    .chip-running { background: rgba(52, 199, 89, 0.2); color: #34c759; border: 1px solid rgba(52, 199, 89, 0.4); box-shadow: 0 0 16px rgba(52, 199, 89, 0.25); }
-    .chip-starting { background: rgba(0, 122, 255, 0.2); color: #0a84ff; border: 1px solid rgba(0, 122, 255, 0.4); animation: pulse-blue 1s infinite alternate; }
-    .chip-fault { background: rgba(255, 59, 48, 0.22); color: #ff453a; border: 1px solid rgba(255, 59, 48, 0.45); box-shadow: 0 0 20px rgba(255, 59, 48, 0.35); }
-
-    @keyframes pulse-blue {
-      0% { opacity: 0.6; }
-      100% { opacity: 1; }
-    }
-
-    /* Large Tactile iOS Power Button */
-    .power-button-wrapper {
-      position: relative;
       margin-bottom: 22px;
+      backdrop-filter: blur(15px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .power-glow-ring {
+    .badge-idle {
+      background: rgba(142, 142, 147, 0.16);
+      color: #d1d5db;
+      border: 1px solid rgba(142, 142, 147, 0.3);
+    }
+
+    .badge-running {
+      background: rgba(52, 199, 89, 0.22);
+      color: #34c759;
+      border: 1.5px solid rgba(52, 199, 89, 0.5);
+      box-shadow: 0 0 24px rgba(52, 199, 89, 0.35);
+    }
+
+    .badge-starting {
+      background: rgba(0, 122, 255, 0.22);
+      color: #38bdf8;
+      border: 1.5px solid rgba(0, 122, 255, 0.5);
+      animation: pulse-badge 1s infinite alternate;
+    }
+
+    .badge-fault {
+      background: rgba(255, 59, 48, 0.25);
+      color: #ff453a;
+      border: 1.5px solid rgba(255, 59, 48, 0.55);
+      box-shadow: 0 0 24px rgba(255, 59, 48, 0.4);
+    }
+
+    @keyframes pulse-badge {
+      0% { opacity: 0.6; transform: scale(0.98); }
+      100% { opacity: 1; transform: scale(1.02); }
+    }
+
+    /* Glass Puck Power Button */
+    .puck-chassis {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .liquid-aura {
       position: absolute;
-      top: -12px;
-      left: -12px;
-      right: -12px;
-      bottom: -12px;
+      top: -16px;
+      left: -16px;
+      right: -16px;
+      bottom: -16px;
       border-radius: 50%;
-      background: conic-gradient(from 0deg, var(--ios-green), var(--ios-blue), var(--ios-teal), var(--ios-green));
-      filter: blur(14px);
+      background: radial-gradient(circle, var(--ios-green-glow) 0%, rgba(56, 189, 248, 0.2) 50%, transparent 70%);
       opacity: 0;
+      filter: blur(20px);
       transition: opacity 0.5s ease;
-      animation: spin-glow 4s linear infinite;
+      animation: fluid-pulse 3s infinite ease-in-out;
     }
 
-    .power-button-wrapper.is-running .power-glow-ring {
-      opacity: 0.7;
+    .puck-chassis.is-running .liquid-aura {
+      opacity: 1;
     }
 
-    .power-button-wrapper.is-fault .power-glow-ring {
-      background: var(--ios-red);
-      opacity: 0.8;
-      filter: blur(16px);
-      animation: none;
+    .puck-chassis.is-fault .liquid-aura {
+      background: radial-gradient(circle, rgba(255, 59, 48, 0.55) 0%, transparent 70%);
+      opacity: 1;
+      filter: blur(22px);
     }
 
-    @keyframes spin-glow {
-      100% { transform: rotate(360deg); }
+    @keyframes fluid-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
     }
 
-    .btn-power {
-      width: 140px;
-      height: 140px;
+    .liquid-puck-btn {
+      width: 150px;
+      height: 150px;
       border-radius: 50%;
-      background: linear-gradient(145deg, #2c2c2e, #1c1c1e);
-      border: 2px solid rgba(255, 255, 255, 0.15);
+      background: 
+        radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+        linear-gradient(145deg, rgba(50, 52, 60, 0.75) 0%, rgba(18, 19, 24, 0.95) 100%);
+      backdrop-filter: blur(30px);
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
+      border-top: 2.5px solid rgba(255, 255, 255, 0.55);
       color: #fff;
       display: flex;
       flex-direction: column;
@@ -251,285 +296,448 @@
       cursor: pointer;
       position: relative;
       z-index: 2;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.1);
-      transition: transform 0.15s cubic-bezier(0.17, 0.89, 0.32, 1.28), background 0.3s;
+      box-shadow: 
+        0 18px 40px rgba(0, 0, 0, 0.7),
+        inset 0 2px 4px rgba(255, 255, 255, 0.3),
+        inset 0 -4px 8px rgba(0, 0, 0, 0.6);
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s;
     }
 
-    .btn-power:active {
-      transform: scale(0.93);
+    .liquid-puck-btn:active {
+      transform: scale(0.92);
     }
 
-    .btn-power svg {
-      width: 44px;
-      height: 44px;
-      stroke: #fff;
-      transition: stroke 0.3s;
+    .liquid-puck-btn svg {
+      width: 48px;
+      height: 48px;
+      stroke: #ffffff;
+      transition: stroke 0.3s, transform 0.3s;
     }
 
-    .btn-power span {
+    .liquid-puck-btn span {
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       margin-top: 8px;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
       color: var(--ios-text-secondary);
       transition: color 0.3s;
     }
 
-    .power-button-wrapper.is-running .btn-power {
-      background: linear-gradient(145deg, #1e3a24, #122316);
+    .puck-chassis.is-running .liquid-puck-btn {
+      background: 
+        radial-gradient(circle at 35% 25%, rgba(52, 199, 89, 0.4) 0%, transparent 60%),
+        linear-gradient(145deg, rgba(20, 55, 30, 0.85) 0%, rgba(10, 28, 15, 0.95) 100%);
       border-color: rgba(52, 199, 89, 0.6);
+      border-top-color: rgba(134, 239, 172, 0.9);
     }
 
-    .power-button-wrapper.is-running .btn-power svg {
-      stroke: var(--ios-green);
+    .puck-chassis.is-running .liquid-puck-btn svg {
+      stroke: #4ade80;
+      transform: scale(1.05);
     }
 
-    .power-button-wrapper.is-running .btn-power span {
-      color: var(--ios-green);
+    .puck-chassis.is-running .liquid-puck-btn span {
+      color: #4ade80;
     }
 
-    .runtime-display {
+    .runtime-counter {
       font-size: 13px;
       font-weight: 600;
       color: var(--ios-text-secondary);
       font-variant-numeric: tabular-nums;
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
-    /* 2x2 Metric Tiles Grid */
-    .metrics-grid {
+    /* 2x2 Telemetry Grid */
+    .metrics-2x2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
 
-    .metric-card {
+    .metric-tile {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 104px;
-      padding: 14px;
+      min-height: 106px;
+      padding: 16px;
     }
 
-    .metric-header {
+    .tile-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .metric-title {
+    .tile-title {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--ios-text-secondary);
       text-transform: uppercase;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.5px;
     }
 
-    .metric-icon svg {
+    .tile-icon svg {
       width: 16px;
       height: 16px;
       stroke: var(--ios-text-tertiary);
     }
 
-    .metric-value-wrap {
+    .tile-val-group {
       margin-top: 8px;
     }
 
-    .metric-value {
-      font-size: 24px;
+    .tile-num {
+      font-size: 26px;
       font-weight: 800;
       letter-spacing: -0.6px;
-      color: #fff;
+      color: #ffffff;
       font-variant-numeric: tabular-nums;
     }
 
-    .metric-unit {
+    .tile-unit {
       font-size: 13px;
       font-weight: 500;
       color: var(--ios-text-secondary);
       margin-left: 2px;
     }
 
-    .metric-sub {
+    .tile-sub {
       font-size: 10px;
       color: var(--ios-text-tertiary);
       margin-top: 2px;
       font-weight: 500;
     }
 
-    /* Tank Visualizer */
-    .tank-display-container {
+    /* REAL FLUID LIQUID TANK (NO SPINNING!) */
+    .tank-visual-row {
       display: flex;
       align-items: center;
-      gap: 20px;
-      padding: 10px 4px;
+      gap: 22px;
+      padding: 12px 6px;
     }
 
-    .tank-capsule {
-      width: 90px;
-      height: 160px;
-      border-radius: 28px;
-      border: 3px solid rgba(255, 255, 255, 0.2);
-      background: rgba(0, 0, 0, 0.4);
+    .tank-cylinder {
+      width: 100px;
+      height: 184px;
+      border-radius: 34px;
+      border: 3px solid rgba(255, 255, 255, 0.24);
+      border-top: 3.5px solid rgba(255, 255, 255, 0.55);
+      background: linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(10,15,25,0.7) 18%, rgba(5,10,20,0.8) 82%, rgba(255,255,255,0.12) 100%);
       position: relative;
       overflow: hidden;
-      box-shadow: inset 0 0 18px rgba(0,0,0,0.6);
+      box-shadow: 
+        0 18px 36px rgba(0, 0, 0, 0.7),
+        inset 0 0 24px rgba(0, 0, 0, 0.85),
+        inset 5px 0 12px rgba(255, 255, 255, 0.18),
+        inset -5px 0 12px rgba(255, 255, 255, 0.1);
       flex-shrink: 0;
     }
 
-    .water-fill {
+    /* Glass specular reflection strip */
+    .tank-cylinder::after {
+      content: '';
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      bottom: 10px;
+      width: 6px;
+      border-radius: 3px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.25) 100%);
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Inflow Stream from top pipe */
+    .inflow-pipe {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 16px;
+      height: 9px;
+      background: rgba(255, 255, 255, 0.35);
+      border-radius: 0 0 5px 5px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+      z-index: 6;
+    }
+
+    .inflow-stream {
+      position: absolute;
+      top: 9px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 5px;
+      height: 70px;
+      background: linear-gradient(180deg, #7dd3fc 0%, #38bdf8 60%, rgba(56, 189, 248, 0.15) 100%);
+      border-radius: 3px;
+      z-index: 4;
+      opacity: 0;
+      transition: opacity 0.3s;
+      animation: stream-flow 0.35s linear infinite;
+    }
+
+    .inflow-stream.active {
+      opacity: 1;
+    }
+
+    @keyframes stream-flow {
+      0% { transform: translateX(-50%) scaleY(0.96) scaleX(0.9); opacity: 0.75; }
+      50% { transform: translateX(-50%) scaleY(1.04) scaleX(1.1); opacity: 1; }
+      100% { transform: translateX(-50%) scaleY(0.96) scaleX(0.9); opacity: 0.75; }
+    }
+
+    /* Liquid Body */
+    .liquid-body {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
       height: 65%;
-      background: linear-gradient(180deg, #38bdf8, #0284c7);
-      transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 -4px 12px rgba(56, 189, 248, 0.5);
+      transition: height 0.6s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
-    .water-wave {
+    /* SVG Horizontal Sine Waves (Translation Only, NEVER SPINNING) */
+    .wave-svg-box {
       position: absolute;
-      top: -10px;
-      left: -50%;
+      top: -15px;
+      left: 0;
+      width: 100%;
+      height: 18px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .liquid-wave-strip {
       width: 200%;
-      height: 20px;
-      background: rgba(255, 255, 255, 0.35);
-      border-radius: 40%;
-      animation: wave-motion 3s linear infinite;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      will-change: transform;
     }
 
-    @keyframes wave-motion {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .wave-front {
+      fill: #38bdf8;
+      animation: wave-slide-front 2.4s linear infinite;
     }
 
-    .tank-details {
+    .wave-back {
+      fill: rgba(2, 132, 199, 0.55);
+      animation: wave-slide-back 3.8s linear infinite;
+    }
+
+    @keyframes wave-slide-front {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    @keyframes wave-slide-back {
+      0% { transform: translateX(-50%); }
+      100% { transform: translateX(0); }
+    }
+
+    .liquid-deep {
+      position: absolute;
+      top: 2px;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 35%, #075985 70%, #0c4a6e 100%);
+      overflow: hidden;
+    }
+
+    /* Floating Rising Bubbles with natural sway and pop */
+    .bubble {
+      position: absolute;
+      bottom: -8px;
+      background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.25) 50%, rgba(56, 189, 248, 0.3) 100%);
+      border: 0.5px solid rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      box-shadow: 0 0 4px rgba(255, 255, 255, 0.25), inset -1px -1px 2px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .b1 { width: 6px; height: 6px; left: 18%; animation: bubble-sway-1 2.8s infinite 0.1s ease-in; }
+    .b2 { width: 9px; height: 9px; left: 42%; animation: bubble-sway-2 3.4s infinite 0.9s ease-in; }
+    .b3 { width: 5px; height: 5px; left: 68%; animation: bubble-sway-1 2.2s infinite 1.6s ease-in; }
+    .b4 { width: 8px; height: 8px; left: 28%; animation: bubble-sway-2 3.1s infinite 2.2s ease-in; }
+    .b5 { width: 7px; height: 7px; left: 78%; animation: bubble-sway-1 3.6s infinite 0.5s ease-in; }
+    .b6 { width: 4px; height: 4px; left: 52%; animation: bubble-sway-2 2.5s infinite 1.8s ease-in; }
+
+    @keyframes bubble-sway-1 {
+      0% {
+        transform: translateY(0) translateX(0) scale(0.6);
+        opacity: 0;
+      }
+      20% {
+        opacity: 0.9;
+        transform: translateY(-25px) translateX(3px) scale(0.85);
+      }
+      50% {
+        transform: translateY(-65px) translateX(-3px) scale(1);
+      }
+      80% {
+        opacity: 0.85;
+        transform: translateY(-105px) translateX(4px) scale(1.1);
+      }
+      100% {
+        transform: translateY(-135px) translateX(0) scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    @keyframes bubble-sway-2 {
+      0% {
+        transform: translateY(0) translateX(0) scale(0.6);
+        opacity: 0;
+      }
+      20% {
+        opacity: 0.9;
+        transform: translateY(-30px) translateX(-4px) scale(0.85);
+      }
+      55% {
+        transform: translateY(-70px) translateX(4px) scale(1);
+      }
+      80% {
+        opacity: 0.85;
+        transform: translateY(-110px) translateX(-3px) scale(1.15);
+      }
+      100% {
+        transform: translateY(-135px) translateX(2px) scale(1.25);
+        opacity: 0;
+      }
+    }
+
+    .tank-data-col {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .detail-row {
+    .data-row {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       padding-bottom: 6px;
     }
 
-    .detail-label {
+    .data-row .lbl {
       font-size: 12px;
       color: var(--ios-text-secondary);
       font-weight: 500;
     }
 
-    .detail-val {
-      font-size: 15px;
-      font-weight: 700;
+    .data-row .val {
+      font-size: 16px;
+      font-weight: 800;
       color: #fff;
     }
 
-    .foil-sensor-tag {
+    .contactless-tag {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      padding: 6px 10px;
-      border-radius: 10px;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 7px 12px;
+      border-radius: 12px;
       font-size: 11px;
       color: #7dd3fc;
-      font-weight: 600;
+      font-weight: 700;
       margin-top: 4px;
     }
 
-    /* Sandbox Scenario Action Buttons */
-    .sandbox-grid {
+    /* Sandbox Action Buttons */
+    .sandbox-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 12px;
       margin-top: 10px;
     }
 
-    .btn-sandbox {
-      background: rgba(255, 255, 255, 0.08);
+    .sandbox-card-btn {
+      background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--ios-border);
-      border-radius: 14px;
-      padding: 12px 10px;
+      border-radius: 18px;
+      padding: 14px 12px;
       color: #fff;
-      font-size: 12px;
-      font-weight: 600;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
       gap: 4px;
       cursor: pointer;
-      transition: all 0.15s ease;
       text-align: left;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .btn-sandbox:active {
+    .sandbox-card-btn:active {
       transform: scale(0.96);
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.12);
     }
 
-    .btn-sandbox .sub {
+    .sandbox-card-btn .btn-head {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .sandbox-card-btn .btn-desc {
       font-size: 10px;
       color: var(--ios-text-secondary);
-      font-weight: 400;
+      line-height: 1.4;
     }
 
-    .btn-sandbox.btn-reset {
+    .sandbox-card-btn.full-span {
       grid-column: span 2;
-      background: rgba(52, 199, 89, 0.15);
+      background: rgba(52, 199, 89, 0.16);
       border-color: rgba(52, 199, 89, 0.4);
       color: #4ade80;
       align-items: center;
-      padding: 14px;
+      padding: 15px;
     }
 
-    /* Tab content view switching */
-    .tab-content {
+    /* Tab Switching */
+    .tab-view {
       display: none;
       flex-direction: column;
       gap: 14px;
     }
 
-    .tab-content.active {
+    .tab-view.active {
       display: flex;
     }
 
-    /* OTA Cloud Card */
-    .ota-progress-bar {
-      height: 6px;
+    /* OTA Progress Bar */
+    .ota-track {
+      height: 8px;
       background: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
+      border-radius: 100px;
       overflow: hidden;
-      margin: 12px 0 6px 0;
+      margin: 14px 0 8px 0;
     }
 
-    .ota-progress-fill {
+    .ota-fill {
       width: 0%;
       height: 100%;
-      background: var(--ios-blue);
-      border-radius: 10px;
+      background: linear-gradient(90deg, var(--ios-blue), #38bdf8);
+      border-radius: 100px;
       transition: width 0.3s;
     }
 
-    /* Banner Alert Notification */
-    .toast-banner {
+    /* Toast Notification Banner */
+    .ios-toast {
       position: fixed;
       top: 16px;
       left: 50%;
       transform: translateX(-50%) translateY(-100px);
-      background: rgba(30, 30, 30, 0.92);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--ios-border);
-      padding: 12px 20px;
+      background: rgba(30, 32, 40, 0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--ios-border-highlight);
+      padding: 12px 22px;
       border-radius: 100px;
       font-size: 13px;
       font-weight: 600;
@@ -537,14 +745,14 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.6);
       z-index: 100;
       opacity: 0;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       pointer-events: none;
     }
 
-    .toast-banner.show {
+    .ios-toast.show {
       transform: translateX(-50%) translateY(0);
       opacity: 1;
     }
@@ -552,115 +760,115 @@
 </head>
 <body>
 
-  <div class="toast-banner" id="toastBanner">
+  <div class="ios-toast" id="iosToast">
     <span id="toastIcon">ℹ️</span>
-    <span id="toastMsg">Notification</span>
+    <span id="toastText">Notification</span>
   </div>
 
-  <div class="app-container">
+  <div class="app-viewport">
     
-    <!-- Top Header Bar -->
+    <!-- Top Header -->
     <div class="header-bar">
-      <div class="app-title-group">
-        <h1>Smart Pump House</h1>
-        <p>Agricultural 250m ESP-NOW Link</p>
+      <div>
+        <div class="brand-title">Smart Pump</div>
+        <div class="brand-sub">250m ESP-NOW LR Controller</div>
       </div>
-      <div class="header-pills">
-        <div class="pill-badge active-green" id="networkPill" onclick="toggleNetworkMode()">
-          <span class="status-dot"></span>
-          <span id="networkText">Local Wi-Fi</span>
+      <div class="header-actions">
+        <div class="liquid-pill active-mode" id="netPill" onclick="toggleNetMode()">
+          <span class="glow-dot"></span>
+          <span id="netText">Local Wi-Fi</span>
         </div>
-        <div class="pill-badge" id="audioPill" onclick="toggleAudio()">
-          <span id="audioIcon">🔊</span>
+        <div class="liquid-pill" id="soundPill" onclick="toggleSound()">
+          <span id="soundIcon">🔊</span>
         </div>
       </div>
     </div>
 
-    <!-- Segmented Navigation Bar -->
-    <div class="segmented-control">
-      <div class="segment-tab active" onclick="switchTab('control', this)">Live Control</div>
-      <div class="segment-tab" onclick="switchTab('tank', this)">Water Tank</div>
-      <div class="segment-tab" onclick="switchTab('sandbox', this)">Test Sandbox</div>
-      <div class="segment-tab" onclick="switchTab('ota', this)">Cloud OTA</div>
+    <!-- Cupertino Segmented Bar -->
+    <div class="segmented-bar">
+      <div class="segment-btn active" onclick="switchNav('control', this)">Live Control</div>
+      <div class="segment-btn" onclick="switchNav('tank', this)">Water Tank</div>
+      <div class="segment-btn" onclick="switchNav('sandbox', this)">Test Sandbox</div>
+      <div class="segment-btn" onclick="switchNav('ota', this)">Cloud OTA</div>
     </div>
 
     <!-- TAB 1: LIVE CONTROL -->
-    <div class="tab-content active" id="tab-control">
+    <div class="tab-view active" id="view-control">
       
-      <!-- Main Pump Hero Card -->
-      <div class="glass-card hero-card">
-        <div class="status-chip chip-idle" id="pumpChip">
+      <!-- Liquid Power Card -->
+      <div class="liquid-card hero-center">
+        <div class="status-badge-liquid badge-idle" id="pumpBadge">
           ● PUMP IDLE / READY
         </div>
 
-        <div class="power-button-wrapper" id="powerWrapper">
-          <div class="power-glow-ring"></div>
-          <button class="btn-power" id="powerBtn" onclick="togglePump()">
+        <div class="puck-chassis" id="puckChassis">
+          <div class="liquid-aura"></div>
+          <button class="liquid-puck-btn" id="puckBtn" onclick="onPuckClick()">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
               <line x1="12" y1="2" x2="12" y2="12"></line>
             </svg>
-            <span id="powerBtnText">START</span>
+            <span id="puckBtnLabel">START</span>
           </button>
         </div>
 
-        <div class="runtime-display" id="runtimeText">Runtime: 00:00:00</div>
+        <div class="runtime-counter" id="runtimeClock">Runtime: 00:00:00</div>
       </div>
 
-      <!-- 2x2 Telemetry Metrics Grid -->
-      <div class="metrics-grid">
-        <div class="glass-card metric-card">
-          <div class="metric-header">
-            <span class="metric-title">Motor Current</span>
-            <div class="metric-icon">
+      <!-- 2x2 Telemetry Grid -->
+      <div class="metrics-2x2">
+        <div class="liquid-card metric-tile">
+          <div class="tile-top">
+            <span class="tile-title">Motor Current</span>
+            <div class="tile-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
             </div>
           </div>
-          <div class="metric-value-wrap">
-            <span class="metric-value" id="currentVal">0.0</span>
-            <span class="metric-unit">A</span>
-            <div class="metric-sub" id="currentSub">Target: 10.0A Normal</div>
+          <div class="tile-val-group">
+            <span class="tile-num" id="currentNum">0.0</span>
+            <span class="tile-unit">A</span>
+            <div class="tile-sub">10.0A Rated Load</div>
           </div>
         </div>
 
-        <div class="glass-card metric-card">
-          <div class="metric-header">
-            <span class="metric-title">Active Power</span>
-            <div class="metric-icon">
+        <div class="liquid-card metric-tile">
+          <div class="tile-top">
+            <span class="tile-title">Active Power</span>
+            <div class="tile-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             </div>
           </div>
-          <div class="metric-value-wrap">
-            <span class="metric-value" id="powerVal">0.00</span>
-            <span class="metric-unit">kW</span>
-            <div class="metric-sub">230V AC Single Phase</div>
+          <div class="tile-val-group">
+            <span class="tile-num" id="powerNum">0.00</span>
+            <span class="tile-unit">kW</span>
+            <div class="tile-sub">230V AC Single Phase</div>
           </div>
         </div>
 
-        <div class="glass-card metric-card">
-          <div class="metric-header">
-            <span class="metric-title">Relay 1 (Hold)</span>
-            <div class="metric-icon">
+        <div class="liquid-card metric-tile">
+          <div class="tile-top">
+            <span class="tile-title">Relay 1 (Hold)</span>
+            <div class="tile-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
             </div>
           </div>
-          <div class="metric-value-wrap">
-            <span class="metric-value" id="relay1Val" style="font-size:18px;">CLOSED</span>
-            <div class="metric-sub">NC Contactor Series</div>
+          <div class="tile-val-group">
+            <span class="tile-num" id="relay1Num" style="font-size:18px;">CLOSED</span>
+            <div class="tile-sub">Contactor NC Line</div>
           </div>
         </div>
 
-        <div class="glass-card metric-card">
-          <div class="metric-header">
-            <span class="metric-title">250m Radio</span>
-            <div class="metric-icon">
+        <div class="liquid-card metric-tile">
+          <div class="tile-top">
+            <span class="tile-title">250m Radio</span>
+            <div class="tile-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
             </div>
           </div>
-          <div class="metric-value-wrap">
-            <span class="metric-value" id="rssiVal">-62</span>
-            <span class="metric-unit">dBm</span>
-            <div class="metric-sub">ESP-NOW LR (0.5 Mbps)</div>
+          <div class="tile-val-group">
+            <span class="tile-num" id="radioNum">-62</span>
+            <span class="tile-unit">dBm</span>
+            <div class="tile-sub">ESP-NOW LR Link</div>
           </div>
         </div>
       </div>
@@ -668,112 +876,130 @@
     </div>
 
     <!-- TAB 2: WATER TANK VISUALIZER -->
-    <div class="tab-content" id="tab-tank">
-      <div class="glass-card">
-        <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 14px;">Overhead Plastic Tank</h3>
+    <div class="tab-view" id="view-tank">
+      <div class="liquid-card">
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 14px;">Overhead Water Tank</h3>
         
-        <div class="tank-display-container">
-          <div class="tank-capsule">
-            <div class="water-fill" id="waterFill">
-              <div class="water-wave"></div>
+        <div class="tank-visual-row">
+          <div class="tank-cylinder">
+            <div class="inflow-pipe"></div>
+            <div class="inflow-stream" id="inflowStream"></div>
+
+            <div class="liquid-body" id="liquidBody">
+              <!-- Horizontal sliding wave SVG (Mathematically Seamless Sine Waves, Zero Spinning) -->
+              <div class="wave-svg-box">
+                <svg class="liquid-wave-strip" viewBox="0 0 400 30" preserveAspectRatio="none">
+                  <path class="wave-back" d="M0,10 C35,18 65,18 100,10 C135,2 165,2 200,10 C235,18 265,18 300,10 C335,2 365,2 400,10 L400,30 L0,30 Z"></path>
+                  <path class="wave-front" d="M0,15 C35,6 65,6 100,15 C135,24 165,24 200,15 C235,6 265,6 300,15 C335,24 365,24 400,15 L400,30 L0,30 Z"></path>
+                </svg>
+              </div>
+              <div class="liquid-deep">
+                <!-- Floating rising air bubbles with natural sway -->
+                <div class="bubble b1"></div>
+                <div class="bubble b2"></div>
+                <div class="bubble b3"></div>
+                <div class="bubble b4"></div>
+                <div class="bubble b5"></div>
+                <div class="bubble b6"></div>
+              </div>
             </div>
           </div>
 
-          <div class="tank-details">
-            <div class="detail-row">
-              <span class="detail-label">Current Level</span>
-              <span class="detail-val" id="tankPercent">65%</span>
+          <div class="tank-data-col">
+            <div class="data-row">
+              <span class="lbl">Water Level</span>
+              <span class="val" id="tankLevelPct">65%</span>
             </div>
-            <div class="detail-row">
-              <span class="detail-label">Liquid Depth</span>
-              <span class="detail-val" id="tankDepth">3.25 ft / 5.0 ft</span>
+            <div class="data-row">
+              <span class="lbl">Liquid Depth</span>
+              <span class="val" id="tankDepthFt">3.25 ft / 5.0 ft</span>
             </div>
-            <div class="detail-row">
-              <span class="detail-label">Est. Time to Full</span>
-              <span class="detail-val" id="tankEstTime">~14 Mins</span>
+            <div class="data-row">
+              <span class="lbl">Est. Time to Full</span>
+              <span class="val" id="tankEstMins">~14 Mins</span>
             </div>
-            <div class="foil-sensor-tag" id="foilBadge">
-              <span>⚡</span> Capacitive Foil: Normal Level
+            <div class="contactless-tag" id="foilTag">
+              <span>⚡</span> Contactless Foil: OK
             </div>
           </div>
         </div>
       </div>
 
-      <div class="glass-card">
-        <h3 style="font-size: 13px; font-weight: 600; color: var(--ios-text-secondary); margin-bottom: 8px;">Contactless Sensing Principle</h3>
+      <div class="liquid-card">
+        <h4 style="font-size: 13px; font-weight: 700; color: var(--ios-text-secondary); margin-bottom: 8px;">Non-Contact Capacitive Sensing</h4>
         <p style="font-size: 12px; color: var(--ios-text-secondary); line-height: 1.5;">
-          A single patch of aluminum foil is taped to the <strong>outside</strong> of the plastic overhead tank. ESP32 monitors capacitance via GPIO 4 Touch0. When water touches the inner wall, the dielectric shift cuts the pump instantly without any drilling or corrosion.
+          A single aluminum foil patch is taped to the <strong>outside</strong> of the plastic tank wall. ESP32 monitors touch capacitance on GPIO 4 Touch0. When water rises to the foil level, the dielectric change trips an immediate cutoff with zero corrosion or tank drilling.
         </p>
       </div>
     </div>
 
     <!-- TAB 3: TEST SANDBOX (CLIENT DEMO SCENARIOS) -->
-    <div class="tab-content" id="tab-sandbox">
-      <div class="glass-card">
-        <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 4px;">Failsafe Simulation Sandbox</h3>
+    <div class="tab-view" id="view-sandbox">
+      <div class="liquid-card">
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Failsafe Simulation Sandbox</h3>
         <p style="font-size: 12px; color: var(--ios-text-secondary); margin-bottom: 14px;">
-          Click any scenario below to demonstrate the hardware safety cutoffs to your client:
+          Click any scenario to demonstrate the hardware safety cutoffs to your client:
         </p>
 
-        <div class="sandbox-grid">
-          <button class="btn-sandbox" onclick="simulateDryRun()">
-            <span>⚠️ Borewell Dry-Run</span>
-            <span class="sub">Current drops &lt; 4.0A $\to$ Auto cutoff after 8s</span>
+        <div class="sandbox-container">
+          <button class="sandbox-card-btn" onclick="triggerDryRun()">
+            <span class="btn-head">⚠️ Borewell Dry-Run</span>
+            <span class="btn-desc">Current drops &lt; 4.0A &rarr; Auto cutoff after 8s</span>
           </button>
 
-          <button class="btn-sandbox" onclick="simulateMotorJam()">
-            <span>🚨 Motor Jam / Overload</span>
-            <span class="sub">Current spikes &gt; 16A $\to$ Instant cutoff &lt; 100ms</span>
+          <button class="sandbox-card-btn" onclick="triggerMotorJam()">
+            <span class="btn-head">🚨 Motor Jam / Overload</span>
+            <span class="btn-desc">Current surges &gt; 16A &rarr; Instant trip &lt; 100ms</span>
           </button>
 
-          <button class="btn-sandbox" onclick="simulateOverflow()">
-            <span>💧 Tank Full Overflow</span>
-            <span class="sub">Foil trips $\to$ Victory Fanfare &amp; auto-stop</span>
+          <button class="sandbox-card-btn" onclick="triggerOverflow()">
+            <span class="btn-head">💧 Tank Full Overflow</span>
+            <span class="btn-desc">Foil trips &rarr; Victory Fanfare &amp; auto-stop</span>
           </button>
 
-          <button class="btn-sandbox" onclick="simulateWatchdog()">
-            <span>📡 Lost 250m Signal</span>
-            <span class="sub">Heartbeat drops $\to$ 3-min Watchdog auto-trip</span>
+          <button class="sandbox-card-btn" onclick="triggerWatchdog()">
+            <span class="btn-head">📡 Lost 250m Link</span>
+            <span class="btn-desc">Heartbeat timeout &rarr; 3-min Watchdog auto-stop</span>
           </button>
 
-          <button class="btn-sandbox btn-reset" onclick="resetSystem()">
-            <span>🔄 Reset to Normal Idle State</span>
+          <button class="sandbox-card-btn full-span" onclick="triggerReset()">
+            <span style="font-size:14px; font-weight:800;">🔄 Reset System to Standby</span>
           </button>
         </div>
       </div>
     </div>
 
     <!-- TAB 4: CLOUD & REMOTE OTA -->
-    <div class="tab-content" id="tab-ota">
-      <div class="glass-card">
-        <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 4px;">Cloud &amp; Wireless OTA</h3>
+    <div class="tab-view" id="view-ota">
+      <div class="liquid-card">
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Cloud &amp; Wireless OTA</h3>
         <p style="font-size: 12px; color: var(--ios-text-secondary); margin-bottom: 16px;">
-          Zero-subscription remote management and firmware updates from anywhere.
+          Zero-subscription remote management and wireless firmware updates from anywhere.
         </p>
 
-        <div class="detail-row">
-          <span class="detail-label">Cloud Broker</span>
-          <span class="detail-val" style="font-size:13px; color: #4ade80;">HiveMQ TLS (Free Tier)</span>
+        <div class="data-row">
+          <span class="lbl">Cloud Broker</span>
+          <span class="val" style="font-size:13px; color: #4ade80;">HiveMQ TLS (Free Tier)</span>
         </div>
-        <div class="detail-row" style="margin-top:8px;">
-          <span class="detail-label">Current Version</span>
-          <span class="detail-val" style="font-size:13px;">v2.4.0-release</span>
+        <div class="data-row" style="margin-top:8px;">
+          <span class="lbl">Installed Firmware</span>
+          <span class="val" style="font-size:13px;">v2.4.0-release</span>
         </div>
-        <div class="detail-row" style="margin-top:8px;">
-          <span class="detail-label">Latest on GitHub</span>
-          <span class="detail-val" style="font-size:13px; color: #38bdf8;">v2.5.0-ready</span>
+        <div class="data-row" style="margin-top:8px;">
+          <span class="lbl">Latest on GitHub</span>
+          <span class="val" style="font-size:13px; color: #38bdf8;">v2.5.0-ready</span>
         </div>
 
-        <div class="ota-progress-bar">
-          <div class="ota-progress-fill" id="otaFill"></div>
+        <div class="ota-track">
+          <div class="ota-fill" id="otaBar"></div>
         </div>
         <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--ios-text-secondary);">
-          <span id="otaStatusText">Ready for Wireless Update</span>
-          <span id="otaPercentText">0%</span>
+          <span id="otaStatusLbl">Ready for Cloud Pull OTA</span>
+          <span id="otaPctLbl">0%</span>
         </div>
 
-        <button class="btn-sandbox btn-reset" style="margin-top:14px; background: rgba(0, 122, 255, 0.2); border-color: rgba(0, 122, 255, 0.4); color: #38bdf8;" onclick="simulateOTAUpdate()">
-          <span>⚡ Trigger Remote Cloud OTA Update</span>
+        <button class="sandbox-card-btn full-span" style="margin-top:14px; background: rgba(0, 122, 255, 0.22); border-color: rgba(0, 122, 255, 0.45); color: #38bdf8;" onclick="triggerOTA()">
+          <span style="font-size:13px; font-weight:700;">⚡ Flash Firmware v2.5.0 Remotely</span>
         </button>
       </div>
     </div>
@@ -781,109 +1007,106 @@
   </div>
 
   <script>
-    // System State Machine
+    // State
     let isRunning = false;
     let isStarting = false;
-    let activeFault = null;
-    let motorCurrent = 0.0;
-    let tankLevel = 65;
-    let runtimeSeconds = 0;
-    let runtimeInterval = null;
-    let currentJitterInterval = null;
-    let audioEnabled = true;
-    let isLocalMode = true;
+    let currentFault = null;
+    let currentAmps = 0.0;
+    let currentTankLevel = 65;
+    let runSeconds = 0;
+    let runTimer = null;
+    let jitterTimer = null;
+    let soundOn = true;
+    let isLocal = true;
 
-    // Web Audio Synthesizer (Genuine Passive Buzzer Melody Player)
-    let audioCtx = null;
+    // Web Audio Synthesizer (Genuine Passive Buzzer Melodies)
+    let audioContext = null;
 
-    function getAudioContext() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function getAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
       }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
       }
-      return audioCtx;
+      return audioContext;
     }
 
-    function playBeep(freq, durationMs, delayMs = 0) {
-      if (!audioEnabled) return;
+    function soundBeep(freq, ms, delay = 0) {
+      if (!soundOn) return;
       try {
-        const ctx = getAudioContext();
+        const ctx = getAudio();
         setTimeout(() => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
-          osc.type = 'square'; // Matches piezo buzzer square-wave harmonics
+          osc.type = 'square';
           osc.frequency.setValueAtTime(freq, ctx.currentTime);
           gain.gain.setValueAtTime(0.08, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + (durationMs / 1000));
+          gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + (ms / 1000));
           osc.connect(gain);
           gain.connect(ctx.destination);
           osc.start();
-          osc.stop(ctx.currentTime + (durationMs / 1000));
-        }, delayMs);
-      } catch (e) {
-        console.warn('Audio blocked by browser policy:', e);
-      }
+          osc.stop(ctx.currentTime + (ms / 1000));
+        }, delay);
+      } catch (e) {}
     }
 
-    // Melodies
-    function playStartMelody() {
-      playBeep(523, 100, 0);    // C5
-      playBeep(659, 100, 120);  // E5
-      playBeep(784, 120, 240);  // G5
-      playBeep(1046, 250, 380); // C6
+    function chimeStart() {
+      soundBeep(523, 100, 0);
+      soundBeep(659, 100, 120);
+      soundBeep(784, 120, 240);
+      soundBeep(1046, 250, 380);
     }
 
-    function playStopMelody() {
-      playBeep(784, 120, 0);    // G5
-      playBeep(659, 120, 140);  // E5
-      playBeep(523, 250, 280);  // C5
+    function chimeStop() {
+      soundBeep(784, 120, 0);
+      soundBeep(659, 120, 140);
+      soundBeep(523, 250, 280);
     }
 
-    function playVictoryMelody() {
-      playBeep(523, 120, 0);    // C5
-      playBeep(659, 120, 140);  // E5
-      playBeep(784, 120, 280);  // G5
-      playBeep(1046, 350, 420); // C6
-      playBeep(784, 120, 800);  // G5
-      playBeep(1046, 400, 940); // C6
+    function chimeFanfare() {
+      soundBeep(523, 120, 0);
+      soundBeep(659, 120, 140);
+      soundBeep(784, 120, 280);
+      soundBeep(1046, 350, 420);
+      soundBeep(784, 120, 800);
+      soundBeep(1046, 400, 940);
     }
 
-    function playAlarmMelody() {
+    function chimeAlarm() {
       for (let i = 0; i < 5; i++) {
-        playBeep(2200, 80, i * 140);
+        soundBeep(2200, 80, i * 140);
       }
     }
 
-    // Toast Notification Banner
-    function showToast(icon, msg) {
-      const banner = document.getElementById('toastBanner');
+    // Toast
+    function showToast(icon, text) {
+      const toast = document.getElementById('iosToast');
       document.getElementById('toastIcon').innerText = icon;
-      document.getElementById('toastMsg').innerText = msg;
-      banner.classList.add('show');
-      setTimeout(() => banner.classList.remove('show'), 3200);
+      document.getElementById('toastText').innerText = text;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // Tab Switching
-    function switchTab(tabId, el) {
-      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.segment-tab').forEach(t => t.classList.remove('active'));
-      document.getElementById('tab-' + tabId).classList.add('active');
-      el.classList.add('active');
+    // Tab Navigation
+    function switchNav(id, btn) {
+      document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('view-' + id).classList.add('active');
+      btn.classList.add('active');
     }
 
-    // Toggle Network Mode (Local Wi-Fi vs Cloud 4G)
-    function toggleNetworkMode() {
-      isLocalMode = !isLocalMode;
-      const pill = document.getElementById('networkPill');
-      const text = document.getElementById('networkText');
-      if (isLocalMode) {
-        pill.className = 'pill-badge active-green';
+    // Toggle Network Mode
+    function toggleNetMode() {
+      isLocal = !isLocal;
+      const pill = document.getElementById('netPill');
+      const text = document.getElementById('netText');
+      if (isLocal) {
+        pill.className = 'liquid-pill active-mode';
         text.innerText = 'Local Wi-Fi';
-        showToast('📶', 'Connected locally to ESP32 (10ms latency)');
+        showToast('📶', 'Connected locally to ESP32 (10ms)');
       } else {
-        pill.className = 'pill-badge';
+        pill.className = 'liquid-pill';
         pill.style.background = 'rgba(0, 122, 255, 0.2)';
         pill.style.borderColor = 'rgba(0, 122, 255, 0.4)';
         pill.style.color = '#38bdf8';
@@ -892,237 +1115,231 @@
       }
     }
 
-    // Toggle Audio
-    function toggleAudio() {
-      audioEnabled = !audioEnabled;
-      document.getElementById('audioIcon').innerText = audioEnabled ? '🔊' : '🔇';
-      showToast(audioEnabled ? '🔊' : '🔇', audioEnabled ? 'Buzzer Audio Enabled' : 'Buzzer Muted');
+    // Toggle Sound
+    function toggleSound() {
+      soundOn = !soundOn;
+      document.getElementById('soundIcon').innerText = soundOn ? '🔊' : '🔇';
+      showToast(soundOn ? '🔊' : '🔇', soundOn ? 'Buzzer Melodies Enabled' : 'Buzzer Muted');
     }
 
-    // Pump Start / Stop Sequence
-    function togglePump() {
-      if (activeFault) {
+    // Puck Button Click
+    function onPuckClick() {
+      if (currentFault) {
         showToast('⚠️', 'Clear active fault in Sandbox before starting');
         return;
       }
 
       if (isRunning || isStarting) {
-        stopPumpSequence();
+        stopPump();
       } else {
-        startPumpSequence();
+        startPump();
       }
     }
 
-    function startPumpSequence() {
-      if (tankLevel >= 100) {
-        showToast('💧', 'Cannot start: Overhead tank is 100% Full!');
+    function startPump() {
+      if (currentTankLevel >= 100) {
+        showToast('💧', 'Tank is already 100% Full!');
         return;
       }
 
       isStarting = true;
-      playStartMelody();
-      showToast('⚡', 'Relay 2 Start Pulse Fired (1.8s momentary)');
-      
-      const chip = document.getElementById('pumpChip');
-      chip.className = 'status-chip chip-starting';
-      chip.innerText = '● STARTING (1.8s PULSE)...';
+      chimeStart();
+      showToast('⚡', 'Relay 2 Start Pulse Fired (1.8s)');
 
-      // Simulate contactor inrush current
-      motorCurrent = 28.4;
-      updateMetricsDisplay();
+      const badge = document.getElementById('pumpBadge');
+      badge.className = 'status-badge-liquid badge-starting';
+      badge.innerText = '● STARTING (1.8s PULSE)...';
+
+      currentAmps = 28.4; // Inrush current
+      renderMetrics();
 
       setTimeout(() => {
         isStarting = false;
         isRunning = true;
-        motorCurrent = 10.2;
-        chip.className = 'status-chip chip-running';
-        chip.innerText = '● 10A MOTOR RUNNING';
+        currentAmps = 10.2; // Normal 10A induction pump load
+        badge.className = 'status-badge-liquid badge-running';
+        badge.innerText = '● 10A MOTOR RUNNING';
 
-        document.getElementById('powerWrapper').className = 'power-button-wrapper is-running';
-        document.getElementById('powerBtnText').innerText = 'STOP';
+        document.getElementById('puckChassis').className = 'puck-chassis is-running';
+        document.getElementById('puckBtnLabel').innerText = 'STOP';
+        document.getElementById('inflowStream').classList.add('active');
 
         startTimers();
         showToast('✅', 'Contactor Latched! Motor Running at 10.2A');
       }, 1800);
     }
 
-    function stopPumpSequence() {
+    function stopPump() {
       isRunning = false;
       isStarting = false;
-      motorCurrent = 0.0;
-      playStopMelody();
+      currentAmps = 0.0;
+      chimeStop();
 
-      const chip = document.getElementById('pumpChip');
-      chip.className = 'status-chip chip-idle';
-      chip.innerText = '● PUMP IDLE / READY';
+      const badge = document.getElementById('pumpBadge');
+      badge.className = 'status-badge-liquid badge-idle';
+      badge.innerText = '● PUMP IDLE / READY';
 
-      document.getElementById('powerWrapper').className = 'power-button-wrapper';
-      document.getElementById('powerBtnText').innerText = 'START';
+      document.getElementById('puckChassis').className = 'puck-chassis';
+      document.getElementById('puckBtnLabel').innerText = 'START';
+      document.getElementById('inflowStream').classList.remove('active');
 
       stopTimers();
-      updateMetricsDisplay();
+      renderMetrics();
       showToast('⏹', 'Relay 1 Opened: Contactor de-energized');
     }
 
-    // Timers & Simulation Loops
     function startTimers() {
       stopTimers();
 
-      // Runtime clock
-      runtimeInterval = setInterval(() => {
-        runtimeSeconds++;
-        const hrs = String(Math.floor(runtimeSeconds / 3600)).padStart(2, '0');
-        const mins = String(Math.floor((runtimeSeconds % 3600) / 60)).padStart(2, '0');
-        const secs = String(runtimeSeconds % 60).padStart(2, '0');
-        document.getElementById('runtimeText').innerText = `Runtime: ${hrs}:${mins}:${secs}`;
+      runTimer = setInterval(() => {
+        runSeconds++;
+        const h = String(Math.floor(runSeconds / 3600)).padStart(2, '0');
+        const m = String(Math.floor((runSeconds % 3600) / 60)).padStart(2, '0');
+        const s = String(runSeconds % 60).padStart(2, '0');
+        document.getElementById('runtimeClock').innerText = `Runtime: ${h}:${m}:${s}`;
 
-        // Slowly fill tank while running
-        if (tankLevel < 100) {
-          tankLevel = Math.min(100, tankLevel + 0.2);
-          updateTankDisplay();
+        if (currentTankLevel < 100) {
+          currentTankLevel = Math.min(100, currentTankLevel + 0.25);
+          renderTank();
         } else {
-          simulateOverflow();
+          triggerOverflow();
         }
       }, 1000);
 
-      // Current micro-jitter for 100% realism
-      currentJitterInterval = setInterval(() => {
-        if (isRunning && !activeFault) {
+      jitterTimer = setInterval(() => {
+        if (isRunning && !currentFault) {
           const jitter = (Math.random() * 0.3 - 0.15);
-          motorCurrent = parseFloat((10.2 + jitter).toFixed(1));
-          updateMetricsDisplay();
+          currentAmps = parseFloat((10.2 + jitter).toFixed(1));
+          renderMetrics();
         }
       }, 800);
     }
 
     function stopTimers() {
-      clearInterval(runtimeInterval);
-      clearInterval(currentJitterInterval);
+      clearInterval(runTimer);
+      clearInterval(jitterTimer);
     }
 
-    function updateMetricsDisplay() {
-      document.getElementById('currentVal').innerText = motorCurrent.toFixed(1);
-      const kw = (motorCurrent * 230 * 0.88 / 1000).toFixed(2);
-      document.getElementById('powerVal').innerText = kw;
+    function renderMetrics() {
+      document.getElementById('currentNum').innerText = currentAmps.toFixed(1);
+      const kw = (currentAmps * 230 * 0.88 / 1000).toFixed(2);
+      document.getElementById('powerNum').innerText = kw;
     }
 
-    function updateTankDisplay() {
-      document.getElementById('waterFill').style.height = tankLevel + '%';
-      document.getElementById('tankPercent').innerText = Math.round(tankLevel) + '%';
-      const depthFt = (tankLevel * 5.0 / 100).toFixed(1);
-      document.getElementById('tankDepth').innerText = `${depthFt} ft / 5.0 ft`;
+    function renderTank() {
+      document.getElementById('liquidBody').style.height = currentTankLevel + '%';
+      document.getElementById('tankLevelPct').innerText = Math.round(currentTankLevel) + '%';
+      const depth = (currentTankLevel * 5.0 / 100).toFixed(1);
+      document.getElementById('tankDepthFt').innerText = `${depth} ft / 5.0 ft`;
 
-      const estMins = Math.max(0, Math.round((100 - tankLevel) * 0.4));
-      document.getElementById('tankEstTime').innerText = isRunning ? `~${estMins} Mins` : 'Paused';
+      const mins = Math.max(0, Math.round((100 - currentTankLevel) * 0.4));
+      document.getElementById('tankEstMins').innerText = isRunning ? `~${mins} Mins` : 'Paused';
     }
 
-    // Failsafe Sandbox Simulation Triggers
-    function simulateDryRun() {
-      if (!isRunning) startPumpSequence();
+    // Sandbox Triggers
+    function triggerDryRun() {
+      if (!isRunning) startPump();
 
       setTimeout(() => {
         showToast('⚠️', 'Borewell water depleted! Current dropping...');
-        motorCurrent = 2.4;
-        updateMetricsDisplay();
+        currentAmps = 2.4;
+        renderMetrics();
 
-        const chip = document.getElementById('pumpChip');
-        chip.className = 'status-chip chip-starting';
-        chip.innerText = '⚠️ DRY-RUN DETECTED (8s TRIP)...';
+        const badge = document.getElementById('pumpBadge');
+        badge.className = 'status-badge-liquid badge-starting';
+        badge.innerText = '⚠️ DRY-RUN DETECTED (8s TRIP)...';
 
         setTimeout(() => {
-          activeFault = 'DRY_RUN';
-          stopPumpSequence();
-          playAlarmMelody();
+          currentFault = 'DRY_RUN';
+          stopPump();
+          chimeAlarm();
 
-          chip.className = 'status-chip chip-fault';
-          chip.innerText = '🚨 FAULT: BOREWELL DRY-RUN TRIP';
-          document.getElementById('powerWrapper').className = 'power-button-wrapper is-fault';
+          badge.className = 'status-badge-liquid badge-fault';
+          badge.innerText = '🚨 FAULT: BOREWELL DRY-RUN TRIP';
+          document.getElementById('puckChassis').className = 'puck-chassis is-fault';
           showToast('🚨', 'Dry Run Protection Cutoff! Motor saved from burnout');
         }, 3000);
       }, 2000);
     }
 
-    function simulateMotorJam() {
-      if (!isRunning) startPumpSequence();
+    function triggerMotorJam() {
+      if (!isRunning) startPump();
 
       setTimeout(() => {
         showToast('🚨', 'Mechanical Jam Simulated! Current spiking > 16A');
-        motorCurrent = 18.2;
-        updateMetricsDisplay();
+        currentAmps = 18.2;
+        renderMetrics();
 
-        activeFault = 'OVERLOAD';
-        stopPumpSequence();
-        playAlarmMelody();
+        currentFault = 'OVERLOAD';
+        stopPump();
+        chimeAlarm();
 
-        const chip = document.getElementById('pumpChip');
-        chip.className = 'status-chip chip-fault';
-        chip.innerText = '🚨 FAULT: MOTOR OVERLOAD TRIP (18.2A)';
-        document.getElementById('powerWrapper').className = 'power-button-wrapper is-fault';
+        const badge = document.getElementById('pumpBadge');
+        badge.className = 'status-badge-liquid badge-fault';
+        badge.innerText = '🚨 FAULT: MOTOR OVERLOAD TRIP (18.2A)';
+        document.getElementById('puckChassis').className = 'puck-chassis is-fault';
       }, 1500);
     }
 
-    function simulateOverflow() {
-      tankLevel = 100;
-      updateTankDisplay();
+    function triggerOverflow() {
+      currentTankLevel = 100;
+      renderTank();
 
-      const foil = document.getElementById('foilBadge');
-      foil.style.background = 'rgba(52, 199, 89, 0.2)';
-      foil.style.borderColor = 'rgba(52, 199, 89, 0.5)';
-      foil.style.color = '#34c759';
-      foil.innerHTML = '<span>🏆</span> Capacitive Foil: TANK 100% FULL';
+      const tag = document.getElementById('foilTag');
+      tag.style.background = 'rgba(52, 199, 89, 0.22)';
+      tag.style.borderColor = 'rgba(52, 199, 89, 0.55)';
+      tag.style.color = '#4ade80';
+      tag.innerHTML = '<span>🏆</span> Contactless Foil: TANK 100% FULL';
 
-      if (isRunning) {
-        stopPumpSequence();
-      }
-      playVictoryMelody();
+      if (isRunning) stopPump();
+      chimeFanfare();
       showToast('🏆', 'Victory Fanfare! Tank full, pump auto-stopped');
     }
 
-    function simulateWatchdog() {
-      showToast('📡', 'Simulating 250m Radio loss...');
-      document.getElementById('rssiVal').innerText = '--';
+    function triggerWatchdog() {
+      showToast('📡', 'Simulating 250m link loss...');
+      document.getElementById('radioNum').innerText = '--';
       setTimeout(() => {
-        activeFault = 'WATCHDOG';
-        stopPumpSequence();
-        playAlarmMelody();
-        const chip = document.getElementById('pumpChip');
-        chip.className = 'status-chip chip-fault';
-        chip.innerText = '🚨 FAULT: 3-MIN WATCHDOG TIMEOUT';
-        document.getElementById('powerWrapper').className = 'power-button-wrapper is-fault';
+        currentFault = 'WATCHDOG';
+        stopPump();
+        chimeAlarm();
+        const badge = document.getElementById('pumpBadge');
+        badge.className = 'status-badge-liquid badge-fault';
+        badge.innerText = '🚨 FAULT: 3-MIN WATCHDOG TIMEOUT';
+        document.getElementById('puckChassis').className = 'puck-chassis is-fault';
       }, 2000);
     }
 
-    function resetSystem() {
-      activeFault = null;
-      stopPumpSequence();
-      tankLevel = 65;
-      runtimeSeconds = 0;
-      document.getElementById('runtimeText').innerText = 'Runtime: 00:00:00';
-      document.getElementById('rssiVal').innerText = '-62';
-      const foil = document.getElementById('foilBadge');
-      foil.style.background = 'rgba(56, 189, 248, 0.12)';
-      foil.style.borderColor = 'rgba(56, 189, 248, 0.3)';
-      foil.style.color = '#7dd3fc';
-      foil.innerHTML = '<span>⚡</span> Capacitive Foil: Normal Level';
-      updateTankDisplay();
+    function triggerReset() {
+      currentFault = null;
+      stopPump();
+      currentTankLevel = 65;
+      runSeconds = 0;
+      document.getElementById('runtimeClock').innerText = 'Runtime: 00:00:00';
+      document.getElementById('radioNum').innerText = '-62';
+      const tag = document.getElementById('foilTag');
+      tag.style.background = 'rgba(56, 189, 248, 0.12)';
+      tag.style.borderColor = 'rgba(56, 189, 248, 0.35)';
+      tag.style.color = '#7dd3fc';
+      tag.innerHTML = '<span>⚡</span> Contactless Foil: OK';
+      renderTank();
       showToast('🔄', 'System reset to normal standby');
     }
 
-    // Remote OTA Simulation
-    function simulateOTAUpdate() {
-      const fill = document.getElementById('otaFill');
-      const statusText = document.getElementById('otaStatusText');
-      const pctText = document.getElementById('otaPercentText');
-      
+    function triggerOTA() {
+      const fill = document.getElementById('otaBar');
+      const statusText = document.getElementById('otaStatusLbl');
+      const pctText = document.getElementById('otaPctLbl');
+
       statusText.innerText = 'Downloading v2.5.0 from GitHub Releases...';
       let progress = 0;
-      const interval = setInterval(() => {
+      const timer = setInterval(() => {
         progress += 5;
         fill.style.width = progress + '%';
         pctText.innerText = progress + '%';
 
         if (progress >= 100) {
-          clearInterval(interval);
+          clearInterval(timer);
           statusText.innerText = 'Flashing ESP32 Flash Memory...';
           setTimeout(() => {
             statusText.innerText = 'Rebooting ESP32...';
@@ -1135,9 +1352,8 @@
       }, 100);
     }
 
-    // Initial render
-    updateTankDisplay();
-    updateMetricsDisplay();
+    renderTank();
+    renderMetrics();
   </script>
 </body>
 </html>
