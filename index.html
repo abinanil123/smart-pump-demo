@@ -3,465 +3,500 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#09090b">
+  <meta name="theme-color" content="#0b0d14">
   <title>Smart Pump</title>
   <style>
+    /* unslop: Ink neutral ramp, quiet chrome, one bright element (the fluid capsule) */
     :root {
-      --bg: #09090b;
-      --surface: #141417;
-      --surface-2: #1c1c20;
-      --border: rgba(255, 255, 255, 0.08);
-      --border-active: rgba(255, 255, 255, 0.2);
-      --text: #fafafa;
-      --text-muted: #71717a;
-      --text-dim: #52525b;
-      --green: #22c55e;
-      --green-soft: rgba(34, 197, 94, 0.12);
-      --red: #ef4444;
-      --red-soft: rgba(239, 68, 68, 0.12);
-      --blue: #0ea5e9;
-      --blue-soft: rgba(14, 165, 233, 0.12);
-      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", sans-serif;
+      --bg-deep: #07080d;
+      --bg-page: #0b0d14;
+      --surface-card: #11141c;
+      --surface-raised: #1a1e28;
+      --surface-active: #232836;
+      --hairline: rgba(238, 240, 245, 0.08);
+      --hairline-hover: rgba(238, 240, 245, 0.16);
+      --hairline-focus: rgba(238, 240, 245, 0.24);
+
+      --text-primary: #eef0f5;
+      --text-secondary: #a3a9b8;
+      --text-muted: #7a8296;
+
+      --accent-water: #0ea5e9;
+      --accent-water-deep: #0284c7;
+      --accent-water-soft: rgba(14, 165, 233, 0.12);
+
+      --status-positive: #4cc38a;
+      --status-positive-soft: rgba(76, 195, 138, 0.12);
+      --status-negative: #e5484d;
+      --status-negative-soft: rgba(229, 72, 77, 0.12);
+
+      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", sans-serif;
+      --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", monospace;
+
+      --radius-card: 16px;
+      --radius-inner: 10px;
+      --radius-pill: 100px;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: var(--font);
+      font-family: var(--font-sans);
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
 
     html, body {
-      overflow-x: hidden;
-      background-color: var(--bg);
-      color: var(--text);
+      overflow-x: clip;
+      background-color: var(--bg-page);
+      color: var(--text-primary);
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 20px 16px;
+      padding: 24px 16px;
+      font-size: 14px;
+      line-height: 1.5;
     }
 
-    .app {
+    :focus-visible {
+      outline: 2px solid var(--hairline-focus);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    .shell {
       width: 100%;
-      max-width: 380px;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Navigation Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px;
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      color: var(--text-primary);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface-card);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-pill);
+      padding: 4px 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color 160ms var(--ease), color 160ms var(--ease);
+    }
+
+    .status-badge:hover {
+      border-color: var(--hairline-hover);
+      color: var(--text-secondary);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--status-positive);
+    }
+
+    .status-dot.red { background: var(--status-negative); }
+    .status-dot.amber { background: #f59e0b; }
+
+    /* The One Bright Element: Fluid Sight Hero Card */
+    .tank-hero {
+      background: var(--surface-card);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-card);
+      padding: 24px 20px;
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
 
-    /* Top Bar */
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .brand {
-      font-size: 17px;
-      font-weight: 600;
-      letter-spacing: -0.4px;
-      color: var(--text);
-    }
-
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      color: var(--text-muted);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 4px 10px;
-      border-radius: 100px;
-      cursor: pointer;
-    }
-
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 6px var(--green);
-    }
-
-    .dot.red { background: var(--red); box-shadow: 0 0 6px var(--red); }
-    .dot.blue { background: var(--blue); box-shadow: 0 0 6px var(--blue); }
-
-    /* Center Visual: The Minimal Liquid Capsule */
-    .tank-hero {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      padding: 28px 24px;
+    .tank-display-split {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       gap: 24px;
-      position: relative;
     }
 
-    /* Minimalist Fluid Capsule */
-    .capsule-tube {
-      width: 84px;
-      height: 170px;
-      border-radius: 42px;
-      background: #0d0e12;
-      border: 2px solid rgba(255, 255, 255, 0.1);
+    /* Precision Sight Capsule */
+    .capsule-chassis {
+      width: 88px;
+      height: 184px;
+      border-radius: 44px;
+      background: var(--bg-deep);
+      border: 1.5px solid var(--hairline);
       position: relative;
       overflow: hidden;
       flex-shrink: 0;
-      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.7);
     }
 
-    /* Capacitive sensor line */
-    .capsule-tube::before {
-      content: '';
+    /* Non-Contact Capacitive Foil Electrode Marker */
+    .foil-sensor-marker {
       position: absolute;
       top: 14px;
       right: 0;
-      width: 6px;
-      height: 18px;
-      background: rgba(255, 255, 255, 0.25);
-      border-radius: 3px 0 0 3px;
-      z-index: 4;
+      width: 5px;
+      height: 20px;
+      background: rgba(238, 240, 245, 0.25);
+      border-radius: 2px 0 0 2px;
+      z-index: 5;
     }
 
-    .capsule-water {
+    .liquid-fill {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
       height: 65%;
-      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 60%, #0369a1 100%);
-      transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      background: linear-gradient(180deg, var(--accent-water) 0%, var(--accent-water-deep) 70%, #034b75 100%);
+      transition: height 400ms var(--ease);
     }
 
-    .capsule-water::after {
+    .liquid-fill::after {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      height: 3px;
+      height: 2px;
       background: #7dd3fc;
-      box-shadow: 0 0 8px #7dd3fc;
     }
 
-    .tank-data {
+    .tank-meta {
       display: flex;
       flex-direction: column;
       gap: 4px;
       flex: 1;
     }
 
-    .tank-label {
+    .meta-label {
       font-size: 12px;
-      font-weight: 500;
       color: var(--text-muted);
+      font-weight: 400;
     }
 
-    .tank-pct {
-      font-size: 52px;
-      font-weight: 700;
+    .meta-percentage {
+      font-size: 48px;
+      font-weight: 500;
       letter-spacing: -1.5px;
       line-height: 1;
-      color: #ffffff;
+      color: var(--text-primary);
       font-variant-numeric: tabular-nums;
+      margin: 2px 0;
     }
 
-    .tank-sub {
+    .meta-sub {
       font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 4px;
+      color: var(--text-secondary);
     }
 
-    .tank-foil-state {
-      font-size: 11px;
-      color: var(--blue);
+    .meta-foil-status {
+      font-size: 12px;
+      color: var(--accent-water);
       margin-top: 8px;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
     }
 
-    /* Slider Under Tank */
-    .slider-wrap {
-      width: 100%;
+    /* Quiet Level Slider */
+    .slider-track {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 0 4px;
+      padding-top: 4px;
+      border-top: 1px solid var(--hairline);
     }
 
-    .slider-wrap input[type=range] {
+    .slider-track input[type=range] {
       flex: 1;
       height: 4px;
       border-radius: 2px;
-      background: var(--surface-2);
+      background: var(--surface-raised);
       outline: none;
       -webkit-appearance: none;
       cursor: pointer;
     }
 
-    .slider-wrap input[type=range]::-webkit-slider-thumb {
+    .slider-track input[type=range]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
-      background: #ffffff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      background: var(--text-primary);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.5);
       cursor: pointer;
+      transition: transform 120ms var(--ease);
     }
 
-    /* Minimalist Power Button */
-    .main-btn {
+    .slider-track input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    .slider-label {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      color: var(--text-muted);
+      min-width: 32px;
+      text-align: right;
+    }
+
+    /* Primary Pump Switch (Quiet Chrome) */
+    .pump-btn {
       width: 100%;
-      height: 56px;
-      border-radius: 100px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text);
-      font-size: 15px;
-      font-weight: 600;
+      height: 48px;
+      border-radius: var(--radius-inner);
+      border: 1px solid var(--hairline);
+      background: var(--surface-raised);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 500;
       letter-spacing: -0.2px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      gap: 8px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      transition: background-color 160ms var(--ease), border-color 160ms var(--ease), transform 120ms var(--ease);
     }
 
-    .main-btn:active {
+    .pump-btn:hover {
+      background: var(--surface-active);
+      border-color: var(--hairline-hover);
+    }
+
+    .pump-btn:active {
       transform: scale(0.98);
     }
 
-    .main-btn.running {
-      background: var(--green);
-      color: #000000;
-      border-color: var(--green);
-      box-shadow: 0 0 24px rgba(34, 197, 94, 0.25);
+    .pump-btn.running {
+      background: var(--status-positive);
+      color: #07080d;
+      border-color: var(--status-positive);
+      font-weight: 600;
     }
 
-    .main-btn.fault {
-      background: var(--red);
+    .pump-btn.fault {
+      background: var(--status-negative);
       color: #ffffff;
-      border-color: var(--red);
+      border-color: var(--status-negative);
+      font-weight: 600;
     }
 
-    .main-btn .btn-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--text-dim);
-    }
-
-    .main-btn.running .btn-dot {
-      background: #000000;
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
-    }
-
-    /* 3 Clean Metrics in One Row */
-    .metrics-row {
+    /* Integrated Telemetry Strip (Single Card, 3 Columns) */
+    .telemetry-strip {
+      background: var(--surface-card);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-card);
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
+      padding: 12px 16px;
+      gap: 12px;
     }
 
-    .metric-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 14px 12px;
+    .telemetry-col {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    .metric-title {
+    .telemetry-label {
       font-size: 11px;
       color: var(--text-muted);
+    }
+
+    .telemetry-val {
+      font-size: 16px;
       font-weight: 500;
-    }
-
-    .metric-value {
-      font-size: 18px;
-      font-weight: 600;
-      letter-spacing: -0.4px;
-      color: var(--text);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
       font-variant-numeric: tabular-nums;
-      margin-top: 2px;
     }
 
-    /* Client Demo Pills (Bottom Minimalist Row) */
-    .demo-section {
+    /* Unobtrusive Test Triggers (Single Quiet Row) */
+    .test-shelf {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
-    .demo-header {
+    .test-shelf-label {
       font-size: 11px;
-      color: var(--text-dim);
-      font-weight: 500;
-      text-align: center;
+      color: var(--text-muted);
+      padding: 0 4px;
     }
 
-    .demo-pills {
+    .test-chips {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
+      grid-template-columns: repeat(4, 1fr);
       gap: 6px;
     }
 
-    .pill-btn {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      font-size: 11px;
-      font-weight: 500;
+    .test-chip {
+      background: var(--surface-card);
+      border: 1px solid var(--hairline);
+      border-radius: 8px;
       padding: 8px 4px;
-      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-secondary);
       cursor: pointer;
       text-align: center;
-      transition: all 0.15s ease;
+      transition: background-color 160ms var(--ease), border-color 160ms var(--ease), color 160ms var(--ease);
     }
 
-    .pill-btn:hover {
-      color: var(--text);
-      border-color: var(--border-active);
+    .test-chip:hover {
+      background: var(--surface-raised);
+      border-color: var(--hairline-hover);
+      color: var(--text-primary);
     }
 
-    .pill-btn:active {
-      transform: scale(0.95);
-      background: var(--surface-2);
+    .test-chip:active {
+      transform: scale(0.97);
     }
 
-    .pill-btn.reset {
+    .test-chip.full-row {
       grid-column: span 4;
-      padding: 8px;
-      color: var(--text-dim);
+      padding: 7px;
+      color: var(--text-muted);
     }
 
-    .pill-btn.reset:hover {
-      color: var(--text);
-    }
-
-    /* Minimal Toast Banner */
-    .toast {
+    /* Quiet Notification Banner */
+    .notice {
       position: fixed;
       top: 16px;
       left: 50%;
       transform: translateX(-50%) translateY(-60px);
-      background: #1c1c20;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      color: var(--text);
+      background: var(--surface-raised);
+      border: 1px solid var(--hairline-hover);
+      color: var(--text-primary);
       font-size: 12px;
-      font-weight: 500;
       padding: 8px 16px;
-      border-radius: 100px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: var(--radius-pill);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      transition: transform 220ms var(--ease);
       pointer-events: none;
       z-index: 50;
       white-space: nowrap;
     }
 
-    .toast.show {
+    .notice.visible {
       transform: translateX(-50%) translateY(0);
     }
   </style>
 </head>
 <body>
 
-  <div class="toast" id="toast">Notification</div>
+  <div class="notice" id="notice">Notification</div>
 
-  <div class="app">
+  <main class="shell">
 
     <!-- Top Bar -->
     <header class="top-bar">
-      <div class="brand">Smart Pump</div>
-      <div class="status-pill" id="statusPill" onclick="toggleAudio()">
-        <span class="dot" id="statusDot"></span>
-        <span id="statusText">250m link</span>
-      </div>
+      <h1 class="brand-title">Smart Pump</h1>
+      <button class="status-badge" id="audioToggle" onclick="toggleAudio()" title="Toggle Web Audio feedback">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusLabel">250m link ok</span>
+      </button>
     </header>
 
-    <!-- Center Hero: Minimal Liquid Capsule -->
+    <!-- The One Bright Element: Fluid Sight Hero Card -->
     <section class="tank-hero">
-      <div class="capsule-tube">
-        <div class="capsule-water" id="capsuleWater"></div>
+      <div class="tank-display-split">
+        <div class="capsule-chassis">
+          <div class="foil-sensor-marker" title="Non-contact capacitive foil electrode (overflow cutoff)"></div>
+          <div class="liquid-fill" id="liquidFill"></div>
+        </div>
+
+        <div class="tank-meta">
+          <span class="meta-label">Water storage</span>
+          <div class="meta-percentage" id="levelPct">65%</div>
+          <div class="meta-sub" id="levelSub">3.25 ft &bull; ~14 min to full</div>
+          <div class="meta-foil-status" id="foilStatus">Foil sensor: armed</div>
+        </div>
       </div>
 
-      <div class="tank-data">
-        <span class="tank-label">Water Level</span>
-        <div class="tank-pct" id="tankPct">65%</div>
-        <div class="tank-sub" id="tankSub">3.2 ft · ~14 min to full</div>
-        <div class="tank-foil-state" id="foilState">Foil sensor: Armed</div>
+      <div class="slider-track">
+        <input type="range" id="levelSlider" min="0" max="100" value="65" oninput="adjustLevel(this.value)">
+        <span class="slider-label" id="sliderNum">65%</span>
       </div>
     </section>
 
-    <!-- Clean Slider to Adjust Level -->
-    <div class="slider-wrap">
-      <input type="range" id="levelSlider" min="0" max="100" value="65" oninput="setLevel(this.value)">
-    </div>
-
-    <!-- The One Primary Action: Power Switch -->
-    <button class="main-btn" id="mainBtn" onclick="togglePump()">
-      <span class="btn-dot"></span>
-      <span id="btnLabel">Start Pump</span>
+    <!-- Primary Action Pump Switch -->
+    <button class="pump-btn" id="pumpBtn" onclick="togglePump()">
+      <span id="pumpBtnText">Start Pump</span>
     </button>
 
-    <!-- 3 Quiet Stats in One Row -->
-    <div class="metrics-row">
-      <div class="metric-card">
-        <span class="metric-title">Current</span>
-        <span class="metric-value" id="ampsVal">0.0 A</span>
+    <!-- Integrated Telemetry Strip (3 Columns) -->
+    <section class="telemetry-strip">
+      <div class="telemetry-col">
+        <span class="telemetry-label">Load current</span>
+        <span class="telemetry-val" id="ampsVal">0.0 A</span>
       </div>
-      <div class="metric-card">
-        <span class="metric-title">Power</span>
-        <span class="metric-value" id="powerVal">0.0 kW</span>
+      <div class="telemetry-col">
+        <span class="telemetry-label">Active power</span>
+        <span class="telemetry-val" id="powerVal">0.00 kW</span>
       </div>
-      <div class="metric-card">
-        <span class="metric-title">Runtime</span>
-        <span class="metric-value" id="runtimeVal">00:00</span>
+      <div class="telemetry-col">
+        <span class="telemetry-label">Runtime</span>
+        <span class="telemetry-val" id="runtimeVal">00:00</span>
       </div>
-    </div>
+    </section>
 
-    <!-- Client Demo Failsafe Triggers (Quiet & Minimal) -->
-    <div class="demo-section">
-      <div class="demo-header">Test safety cutoffs for client:</div>
-      <div class="demo-pills">
-        <button class="pill-btn" onclick="testDryRun()">Dry-Run</button>
-        <button class="pill-btn" onclick="testOverload()">Overload</button>
-        <button class="pill-btn" onclick="testOverflow()">Overflow</button>
-        <button class="pill-btn" onclick="testLinkLoss()">Lost Link</button>
-        <button class="pill-btn reset" onclick="resetAll()">Reset Standby</button>
+    <!-- Unobtrusive Test Triggers (Bottom Shelf) -->
+    <section class="test-shelf">
+      <div class="test-shelf-label">Simulate safety cutoffs:</div>
+      <div class="test-chips">
+        <button class="test-chip" onclick="simulateDryRun()">Dry-Run</button>
+        <button class="test-chip" onclick="simulateOverload()">Overload</button>
+        <button class="test-chip" onclick="simulateOverflow()">Overflow</button>
+        <button class="test-chip" onclick="simulateLinkLoss()">Lost Link</button>
+        <button class="test-chip full-row" onclick="resetSystem()">Reset to standby</button>
       </div>
-    </div>
+    </section>
 
-  </div>
+  </main>
 
   <script>
-    // Minimal State
+    // System State
     let isRunning = false;
     let isStarting = false;
     let activeFault = null;
     let currentAmps = 0.0;
     let currentLevel = 65;
-    let runtimeSeconds = 0;
+    let runtimeSec = 0;
     let runTimer = null;
-    let soundEnabled = true;
+    let audioEnabled = true;
 
-    // Web Audio Synthesizer (Pure Clean Chimes)
+    // Web Audio Synthesizer (Harmonic Clean Tones)
     let audioCtx = null;
     function getAudio() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -470,7 +505,7 @@
     }
 
     function playTone(freq, ms, delay = 0, type = 'sine') {
-      if (!soundEnabled) return;
+      if (!audioEnabled) return;
       try {
         const ctx = getAudio();
         setTimeout(() => {
@@ -488,47 +523,47 @@
       } catch (e) {}
     }
 
-    function soundStart() {
+    function chimeStart() {
       playTone(523, 70, 0);
       playTone(659, 70, 90);
       playTone(784, 140, 180);
     }
 
-    function soundStop() {
+    function chimeStop() {
       playTone(784, 70, 0);
       playTone(523, 140, 90);
     }
 
-    function soundVictory() {
+    function chimeVictory() {
       playTone(523, 80, 0);
       playTone(659, 80, 100);
       playTone(784, 90, 200);
-      playTone(1046, 250, 310);
+      playTone(1046, 260, 310);
     }
 
-    function soundAlarm() {
-      playTone(2000, 60, 0, 'square');
-      playTone(2000, 60, 120, 'square');
-      playTone(2000, 60, 240, 'square');
+    function chimeAlarm() {
+      playTone(1900, 60, 0, 'square');
+      playTone(1900, 60, 120, 'square');
+      playTone(1900, 60, 240, 'square');
     }
 
-    function showToast(text) {
-      const toast = document.getElementById('toast');
-      toast.innerText = text;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2600);
+    function showNotice(text) {
+      const el = document.getElementById('notice');
+      el.innerText = text;
+      el.classList.add('visible');
+      setTimeout(() => el.classList.remove('visible'), 2600);
     }
 
     function toggleAudio() {
-      soundEnabled = !soundEnabled;
-      showToast(soundEnabled ? 'Audio on' : 'Audio muted');
+      audioEnabled = !audioEnabled;
+      showNotice(audioEnabled ? 'Audio feedback enabled' : 'Audio feedback muted');
     }
 
-    // Toggle Pump
+    // Pump Primary Action
     function togglePump() {
       if (activeFault) {
-        soundAlarm();
-        showToast('Trip locked: ' + activeFault + '. Tap Reset.');
+        chimeAlarm();
+        showNotice('Trip locked: ' + activeFault + '. Tap reset below.');
         return;
       }
       if (isRunning || isStarting) {
@@ -540,31 +575,31 @@
 
     function startPump() {
       isStarting = true;
-      soundStart();
+      chimeStart();
 
-      const btn = document.getElementById('mainBtn');
-      const label = document.getElementById('btnLabel');
-      btn.className = 'main-btn';
-      label.innerText = 'Starting (1.8s pulse)...';
+      const btn = document.getElementById('pumpBtn');
+      const text = document.getElementById('pumpBtnText');
+      btn.className = 'pump-btn';
+      text.innerText = 'Starting (1.8s pulse)...';
 
       currentAmps = 28.4;
-      renderMetrics();
-      showToast('Relay 2 fired (1.8s start pulse)');
+      renderTelemetry();
+      showNotice('Relay 2 fired (1.8s start pulse)');
 
       setTimeout(() => {
         isStarting = false;
         isRunning = true;
         currentAmps = 10.2;
 
-        btn.className = 'main-btn running';
-        label.innerText = 'Stop Pump · 10.2A';
+        btn.className = 'pump-btn running';
+        text.innerText = 'Stop Pump (10.2 A)';
 
-        document.getElementById('statusDot').className = 'dot';
-        document.getElementById('statusText').innerText = 'Running';
+        document.getElementById('statusDot').className = 'status-dot';
+        document.getElementById('statusLabel').innerText = '10.2A running';
 
         startTimers();
-        renderMetrics();
-        showToast('Contactor latched: 10.2A running');
+        renderTelemetry();
+        showNotice('Contactor latched closed');
       }, 1800);
     }
 
@@ -572,33 +607,33 @@
       isRunning = false;
       isStarting = false;
       currentAmps = 0.0;
-      soundStop();
+      chimeStop();
 
-      const btn = document.getElementById('mainBtn');
-      const label = document.getElementById('btnLabel');
-      btn.className = 'main-btn';
-      label.innerText = 'Start Pump';
+      const btn = document.getElementById('pumpBtn');
+      const text = document.getElementById('pumpBtnText');
+      btn.className = 'pump-btn';
+      text.innerText = 'Start Pump';
 
-      document.getElementById('statusDot').className = 'dot';
-      document.getElementById('statusText').innerText = '250m link';
+      document.getElementById('statusDot').className = 'status-dot';
+      document.getElementById('statusLabel').innerText = '250m link ok';
 
       stopTimers();
-      renderMetrics();
+      renderTelemetry();
     }
 
     function startTimers() {
       stopTimers();
       runTimer = setInterval(() => {
-        runtimeSeconds++;
-        const m = String(Math.floor(runtimeSeconds / 60)).padStart(2, '0');
-        const s = String(runtimeSeconds % 60).padStart(2, '0');
+        runtimeSec++;
+        const m = String(Math.floor(runtimeSec / 60)).padStart(2, '0');
+        const s = String(runtimeSec % 60).padStart(2, '0');
         document.getElementById('runtimeVal').innerText = `${m}:${s}`;
 
         if (currentLevel < 100) {
-          currentLevel = Math.min(100, currentLevel + 0.3);
-          renderTank();
+          currentLevel = Math.min(100, currentLevel + 0.35);
+          renderLevel();
         } else {
-          testOverflow();
+          simulateOverflow();
         }
       }, 1000);
     }
@@ -607,122 +642,124 @@
       clearInterval(runTimer);
     }
 
-    function renderMetrics() {
+    function renderTelemetry() {
       document.getElementById('ampsVal').innerText = currentAmps.toFixed(1) + ' A';
-      const kw = (currentAmps * 230 * 0.88 / 1000).toFixed(1);
+      const kw = (currentAmps * 230 * 0.88 / 1000).toFixed(2);
       document.getElementById('powerVal').innerText = kw + ' kW';
     }
 
-    function renderTank() {
-      document.getElementById('capsuleWater').style.height = currentLevel + '%';
-      document.getElementById('tankPct').innerText = Math.round(currentLevel) + '%';
-      const depth = (currentLevel * 5.0 / 100).toFixed(1);
+    function renderLevel() {
+      document.getElementById('liquidFill').style.height = currentLevel + '%';
+      document.getElementById('levelPct').innerText = Math.round(currentLevel) + '%';
+      const depth = (currentLevel * 5.0 / 100).toFixed(2);
       const mins = Math.max(0, Math.round((100 - currentLevel) * 0.4));
-      document.getElementById('tankSub').innerText = `${depth} ft · ~${mins} min to full`;
+      document.getElementById('levelSub').innerText = `${depth} ft \u2022 ~${mins} min to full`;
+
       document.getElementById('levelSlider').value = Math.round(currentLevel);
+      document.getElementById('sliderNum').innerText = `${Math.round(currentLevel)}%`;
 
-      const foil = document.getElementById('foilState');
+      const foil = document.getElementById('foilStatus');
       if (currentLevel >= 100) {
-        foil.innerText = 'Foil sensor: Tripped (100% full)';
-        foil.style.color = 'var(--green)';
+        foil.innerText = 'Foil sensor: tripped (100% full)';
+        foil.style.color = 'var(--status-positive)';
       } else {
-        foil.innerText = 'Foil sensor: Armed';
-        foil.style.color = 'var(--blue)';
+        foil.innerText = 'Foil sensor: armed';
+        foil.style.color = 'var(--accent-water)';
       }
     }
 
-    function setLevel(val) {
+    function adjustLevel(val) {
       currentLevel = parseFloat(val);
-      renderTank();
+      renderLevel();
       if (currentLevel >= 100) {
-        testOverflow();
+        simulateOverflow();
       }
     }
 
-    // Safety Demo Triggers
-    function testDryRun() {
+    // Safety Simulation Handlers
+    function simulateDryRun() {
       if (!isRunning) startPump();
       setTimeout(() => {
         currentAmps = 2.4;
-        renderMetrics();
-        showToast('Current dropped to 2.4A (water depleted)');
+        renderTelemetry();
+        showNotice('Current dropped to 2.4A (water depleted)');
 
         setTimeout(() => {
           activeFault = 'DRY RUN';
           stopPump();
-          soundAlarm();
+          chimeAlarm();
 
-          const btn = document.getElementById('mainBtn');
-          btn.className = 'main-btn fault';
-          document.getElementById('btnLabel').innerText = 'Fault: Borewell Dry-Run Trip';
+          const btn = document.getElementById('pumpBtn');
+          btn.className = 'pump-btn fault';
+          document.getElementById('pumpBtnText').innerText = 'Fault: Borewell Dry-Run';
 
-          document.getElementById('statusDot').className = 'dot red';
-          document.getElementById('statusText').innerText = 'Dry-run trip';
-          showToast('Dry-run auto-stop: motor protected');
+          document.getElementById('statusDot').className = 'status-dot red';
+          document.getElementById('statusLabel').innerText = 'Dry-run trip';
+          showNotice('Dry-run cutoff: motor protected');
         }, 2200);
       }, 1200);
     }
 
-    function testOverload() {
+    function simulateOverload() {
       if (!isRunning) startPump();
       setTimeout(() => {
         currentAmps = 18.2;
-        renderMetrics();
+        renderTelemetry();
 
         activeFault = 'OVERLOAD';
         stopPump();
-        soundAlarm();
+        chimeAlarm();
 
-        const btn = document.getElementById('mainBtn');
-        btn.className = 'main-btn fault';
-        document.getElementById('btnLabel').innerText = 'Fault: Overload Trip (18.2A)';
+        const btn = document.getElementById('pumpBtn');
+        btn.className = 'pump-btn fault';
+        document.getElementById('pumpBtnText').innerText = 'Fault: Overload Trip (18.2 A)';
 
-        document.getElementById('statusDot').className = 'dot red';
-        document.getElementById('statusText').innerText = 'Overload trip';
-        showToast('Overload trip executed in 74ms');
+        document.getElementById('statusDot').className = 'status-dot red';
+        document.getElementById('statusLabel').innerText = 'Overload trip';
+        showNotice('Overload interrupt executed in 74ms');
       }, 1000);
     }
 
-    function testOverflow() {
+    function simulateOverflow() {
       currentLevel = 100;
-      renderTank();
+      renderLevel();
       if (isRunning) stopPump();
-      soundVictory();
-      showToast('Tank 100% full: auto-stopped');
+      chimeVictory();
+      showNotice('Tank 100% full: auto-stopped');
     }
 
-    function testLinkLoss() {
-      document.getElementById('statusDot').className = 'dot red';
-      document.getElementById('statusText').innerText = 'Link lost';
-      showToast('250m link lost: 3-min timer counting');
+    function simulateLinkLoss() {
+      document.getElementById('statusDot').className = 'status-dot amber';
+      document.getElementById('statusLabel').innerText = 'Link lost';
+      showNotice('250m link lost: 3-min timer counting');
 
       setTimeout(() => {
         activeFault = 'LINK LOSS';
         stopPump();
-        soundAlarm();
+        chimeAlarm();
 
-        const btn = document.getElementById('mainBtn');
-        btn.className = 'main-btn fault';
-        document.getElementById('btnLabel').innerText = 'Fault: Watchdog Timeout';
+        const btn = document.getElementById('pumpBtn');
+        btn.className = 'pump-btn fault';
+        document.getElementById('pumpBtnText').innerText = 'Fault: Watchdog Timeout';
       }, 1800);
     }
 
-    function resetAll() {
+    function resetSystem() {
       activeFault = null;
       stopPump();
       currentLevel = 65;
-      runtimeSeconds = 0;
+      runtimeSec = 0;
       document.getElementById('runtimeVal').innerText = '00:00';
-      document.getElementById('statusDot').className = 'dot';
-      document.getElementById('statusText').innerText = '250m link';
-      renderTank();
-      renderMetrics();
-      showToast('Reset to standby');
+      document.getElementById('statusDot').className = 'status-dot';
+      document.getElementById('statusLabel').innerText = '250m link ok';
+      renderLevel();
+      renderTelemetry();
+      showNotice('System reset to standby');
     }
 
     // Initial Render
-    renderTank();
-    renderMetrics();
+    renderLevel();
+    renderTelemetry();
   </script>
 </body>
 </html>
