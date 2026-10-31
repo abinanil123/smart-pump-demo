@@ -2,198 +2,160 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#030712">
-  <title>Smart Pump</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Smart Pump — Precision Instrument Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:ital,wght@0,400;0,500;1,400&family=Host+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
+    /* Hallmark · console: graphite · Host Grotesk over Atkinson Hyperlegible Mono · instrument console */
+
     :root {
-      --ios-bg: #030712;
-      --ios-card: rgba(20, 24, 34, 0.68);
-      --ios-card-sheen: rgba(255, 255, 255, 0.09);
-      --ios-border: rgba(255, 255, 255, 0.14);
-      --ios-border-highlight: rgba(255, 255, 255, 0.35);
-      --ios-text: #f9fafb;
-      --ios-text-secondary: rgba(243, 244, 246, 0.68);
-      --ios-text-tertiary: rgba(243, 244, 246, 0.42);
-      --ios-green: #34c759;
-      --ios-green-glow: rgba(52, 199, 89, 0.5);
-      --ios-blue: #007aff;
-      --ios-cyan: #38bdf8;
-      --ios-red: #ff3b30;
-      --ios-red-glow: rgba(255, 59, 48, 0.5);
-      --ios-orange: #ff9500;
-      --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+      /* Hallmark Console Theme Tokens in OKLCH */
+      --color-paper: oklch(17% 0.008 250);
+      --color-paper-2: oklch(21% 0.009 250);
+      --color-paper-3: oklch(13.5% 0.007 250);
+      --color-ink: oklch(95% 0.005 250);
+      --color-ink-2: oklch(83% 0.008 250);
+      --color-muted: oklch(71% 0.01 250);
+      --color-rule: oklch(31% 0.01 250);
+      --color-rule-2: oklch(42% 0.012 250);
+
+      /* Semantic Roles: Amber = Human Operator, Cool Blue = Sensor Instrument */
+      --color-accent: oklch(82% 0.15 80);
+      --color-accent-ink: oklch(18% 0.04 75);
+      --color-accent-soft: oklch(29% 0.05 80);
+      --color-focus: oklch(82% 0.15 80);
+
+      --color-cool: oklch(77% 0.12 245);
+      --color-cool-soft: oklch(29% 0.05 245);
+
+      --color-ok: oklch(76% 0.15 150);
+      --color-ok-soft: oklch(24.5% 0.03 150);
+      --color-bad: oklch(70% 0.17 25);
+      --color-bad-soft: oklch(24.5% 0.035 25);
+
+      --font-display: "Host Grotesk", ui-sans-serif, system-ui, sans-serif;
+      --font-body: var(--font-display);
+      --font-measured: "Atkinson Hyperlegible Mono", ui-monospace, monospace;
+
+      --radius-card: 10px;
+      --radius-pill: 6px;
+      --rule-hair: 1px;
+      --tracking-display: -0.03em;
+      --display-weight: 500;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: var(--font-stack);
       -webkit-tap-highlight-color: transparent;
-      user-select: none;
+    }
+
+    html, body {
+      overflow-x: clip;
+      background-color: var(--color-paper);
+      color: var(--color-ink);
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.5;
     }
 
     body {
-      background-color: var(--ios-bg);
-      color: var(--ios-text);
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      background-image: 
-        radial-gradient(circle at 12% 18%, rgba(59, 130, 246, 0.28) 0%, transparent 40%),
-        radial-gradient(circle at 88% 12%, rgba(168, 85, 247, 0.24) 0%, transparent 45%),
-        radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.18) 0%, transparent 50%),
-        radial-gradient(circle at 85% 85%, rgba(34, 197, 94, 0.22) 0%, transparent 45%),
-        radial-gradient(circle at 15% 80%, rgba(99, 102, 241, 0.25) 0%, transparent 45%);
-      background-attachment: fixed;
-      padding: 14px 14px 80px 14px;
-      overflow-x: hidden;
-      position: relative;
+      padding: 24px 16px 80px 16px;
     }
 
-    /* Living Ambient Glowing Orbs */
-    .ambient-orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.45;
-      animation: orb-drift 18s infinite alternate ease-in-out;
-    }
-    .orb-1 { width: 340px; height: 340px; background: #0284c7; top: -60px; left: -80px; }
-    .orb-2 { width: 320px; height: 320px; background: #7c3aed; bottom: 40px; right: -80px; animation-duration: 22s; }
-
-    @keyframes orb-drift {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(40px, 30px) scale(1.12); }
-      100% { transform: translate(-30px, 50px) scale(0.95); }
+    :focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
     }
 
-    .app-viewport {
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    .console-shell {
       width: 100%;
-      max-width: 440px;
+      max-width: 680px;
       display: flex;
       flex-direction: column;
       gap: 14px;
-      position: relative;
-      z-index: 1;
     }
 
-    /* Apple Dynamic Island */
-    .island-container {
-      display: flex;
-      justify-content: center;
+    /* Hallmark Hairline Panels Container */
+    .panels {
+      display: grid;
+      gap: var(--rule-hair);
+      background-color: var(--color-rule);
+      border: var(--rule-hair) solid var(--color-rule);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+    }
+
+    .panels > * {
+      background-color: var(--color-paper-2);
+      padding: 16px 18px;
+    }
+
+    /* Typography Utilities */
+    .label {
+      font-size: 12px;
+      color: var(--color-muted);
+      font-weight: 400;
       margin-bottom: 2px;
     }
 
-    .dynamic-island {
-      background: #000000;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 36px;
-      padding: 6px 14px;
-      min-height: 38px;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.3);
-      cursor: pointer;
-      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      max-width: 96%;
+    .measured {
+      font-family: var(--font-measured);
+      font-variant-numeric: tabular-nums slashed-zero;
+      letter-spacing: -0.02em;
     }
 
-    .dynamic-island.is-expanded {
-      padding: 10px 18px;
-      border-radius: 28px;
-      background: rgba(10, 14, 22, 0.95);
-      border-color: rgba(56, 189, 248, 0.4);
-      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.85), 0 0 20px rgba(56, 189, 248, 0.25);
-    }
-
-    .dynamic-island.is-fault {
-      border-color: rgba(255, 59, 48, 0.6);
-      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.85), 0 0 25px rgba(255, 59, 48, 0.35);
-      animation: island-pulse 1s infinite alternate;
-    }
-
-    @keyframes island-pulse {
-      0% { transform: scale(1); }
-      100% { transform: scale(1.02); }
-    }
-
-    .island-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #34c759;
-      box-shadow: 0 0 8px #34c759;
-      flex-shrink: 0;
-    }
-
-    .island-dot.red { background: #ff3b30; box-shadow: 0 0 10px #ff3b30; }
-    .island-dot.blue { background: #38bdf8; box-shadow: 0 0 10px #38bdf8; animation: pulse 1s infinite; }
-
-    .island-text {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .island-subtag {
-      font-size: 10px;
+    .measured-lg {
+      font-family: var(--font-measured);
+      font-size: 32px;
       font-weight: 500;
-      color: var(--ios-text-secondary);
-      background: rgba(255, 255, 255, 0.1);
-      padding: 2px 7px;
-      border-radius: 100px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums slashed-zero;
+      color: var(--color-ink);
     }
 
-    /* Top Brand Header */
-    .header-bar {
+    .measured-unit {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--color-muted);
+      margin-left: 3px;
+    }
+
+    /* Header Bar */
+    .header-panel {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 0 4px;
+      align-items: flex-start;
+      border-bottom: var(--rule-hair) solid var(--color-rule);
+      padding-bottom: 12px;
     }
 
     .brand-title {
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: -0.7px;
-      background: linear-gradient(180deg, #ffffff 40%, rgba(255, 255, 255, 0.68) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .brand-title span.badge-chip {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      color: #38bdf8;
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      padding: 3px 8px;
-      border-radius: 100px;
-      -webkit-text-fill-color: #38bdf8;
-      vertical-align: middle;
-    }
-
-    .brand-sub {
-      font-size: 11px;
-      color: var(--ios-text-secondary);
+      font-family: var(--font-display);
+      font-size: 20px;
       font-weight: 600;
-      letter-spacing: 0.2px;
-      margin-top: 1px;
+      letter-spacing: var(--tracking-display);
+      color: var(--color-ink);
+      line-height: 1.2;
+    }
+
+    .brand-desc {
+      font-size: 12px;
+      color: var(--color-muted);
+      margin-top: 2px;
     }
 
     .header-actions {
@@ -202,1343 +164,1002 @@
       align-items: center;
     }
 
-    .liquid-pill {
+    /* Buttons & Keycaps */
+    .btn-key {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
-      padding: 7px 13px;
-      border-radius: 100px;
-      font-size: 11px;
-      font-weight: 600;
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(25px);
-      border: 1px solid var(--ios-border);
-      border-top: 1px solid rgba(255, 255, 255, 0.3);
-      color: var(--ios-text-secondary);
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .liquid-pill:active { transform: scale(0.94); }
-    .liquid-pill.active-mode {
-      background: rgba(52, 199, 89, 0.16);
-      border-color: rgba(52, 199, 89, 0.45);
-      color: #4ade80;
-    }
-
-    /* True Apple Liquid Glass Cards */
-    .liquid-card {
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 100%), var(--ios-card);
-      backdrop-filter: blur(34px) saturate(210%);
-      -webkit-backdrop-filter: blur(34px) saturate(210%);
-      border: 1px solid var(--ios-border);
-      border-top: 1.5px solid var(--ios-border-highlight);
-      border-radius: 26px;
-      padding: 18px;
-      box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.55),
-        inset 0 1px 1px rgba(255, 255, 255, 0.35),
-        inset 0 -1px 1px rgba(0, 0, 0, 0.5);
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
-    }
-
-    .liquid-card::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.06), transparent 50%);
-      pointer-events: none;
-    }
-
-    /* HERO SPLIT SECTION: TANK + POWER CONTROL */
-    .hero-split-grid {
-      display: grid;
-      grid-template-columns: 120px 1fr;
-      gap: 16px;
-      align-items: center;
-    }
-
-    /* ULTRA-REALISTIC LIQUID GLASS CYLINDER TANK */
-    .tank-chassis {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .tank-cylinder {
-      width: 104px;
-      height: 196px;
-      border-radius: 36px;
-      border: 3px solid rgba(255, 255, 255, 0.25);
-      border-top: 3.5px solid rgba(255, 255, 255, 0.58);
-      background: linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(10,15,25,0.7) 18%, rgba(5,10,20,0.85) 82%, rgba(255,255,255,0.12) 100%);
-      position: relative;
-      overflow: hidden;
-      box-shadow: 
-        0 18px 36px rgba(0, 0, 0, 0.75),
-        inset 0 0 24px rgba(0, 0, 0, 0.85),
-        inset 6px 0 12px rgba(255, 255, 255, 0.2),
-        inset -6px 0 12px rgba(255, 255, 255, 0.1);
-      flex-shrink: 0;
-    }
-
-    /* Curved glass lens reflection strip */
-    .tank-cylinder::after {
-      content: '';
-      position: absolute;
-      top: 10px;
-      left: 12px;
-      bottom: 10px;
-      width: 6px;
-      border-radius: 3px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.3) 100%);
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    /* Capacitive touch foil indicator on the tank wall */
-    .foil-sensor-tape {
-      position: absolute;
-      top: 18px;
-      right: 0;
-      width: 10px;
-      height: 28px;
-      background: linear-gradient(90deg, rgba(217, 119, 6, 0.7), rgba(251, 191, 36, 0.95));
-      border-radius: 4px 0 0 4px;
-      border: 1px solid rgba(254, 240, 138, 0.8);
-      border-right: none;
-      z-index: 9;
-      box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
-    }
-
-    .tank-scale-lines {
-      position: absolute;
-      left: 6px;
-      top: 24px;
-      bottom: 24px;
-      width: 12px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      z-index: 7;
-      pointer-events: none;
-    }
-
-    .scale-mark {
-      width: 8px;
-      height: 1.5px;
-      background: rgba(255, 255, 255, 0.35);
-      border-radius: 1px;
-    }
-
-    /* Inflow Stream from top pipe */
-    .inflow-pipe {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 18px;
-      height: 10px;
-      background: rgba(255, 255, 255, 0.38);
-      border-radius: 0 0 6px 6px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
-      z-index: 8;
-    }
-
-    .inflow-stream {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 5px;
-      height: 75px;
-      background: linear-gradient(180deg, #7dd3fc 0%, #38bdf8 65%, rgba(56, 189, 248, 0.15) 100%);
-      border-radius: 3px;
-      z-index: 5;
-      opacity: 0;
-      transition: opacity 0.3s;
-      animation: stream-flow 0.35s linear infinite;
-    }
-
-    .inflow-stream.active { opacity: 1; }
-
-    @keyframes stream-flow {
-      0% { transform: translateX(-50%) scaleY(0.96) scaleX(0.9); opacity: 0.75; }
-      50% { transform: translateX(-50%) scaleY(1.04) scaleX(1.1); opacity: 1; }
-      100% { transform: translateX(-50%) scaleY(0.96) scaleX(0.9); opacity: 0.75; }
-    }
-
-    /* Liquid Body */
-    .liquid-body {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 65%;
-      transition: height 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    /* SVG Horizontal Sine Waves (Translation Only, NEVER SPINNING) */
-    .wave-svg-box {
-      position: absolute;
-      top: -15px;
-      left: 0;
-      width: 100%;
-      height: 18px;
-      overflow: hidden;
-      pointer-events: none;
-    }
-
-    .liquid-wave-strip {
-      width: 200%;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-      will-change: transform;
-    }
-
-    .wave-front {
-      fill: #38bdf8;
-      animation: wave-slide-front 2.4s linear infinite;
-    }
-
-    .wave-back {
-      fill: rgba(2, 132, 199, 0.55);
-      animation: wave-slide-back 3.8s linear infinite;
-    }
-
-    @keyframes wave-slide-front {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-
-    @keyframes wave-slide-back {
-      0% { transform: translateX(-50%); }
-      100% { transform: translateX(0); }
-    }
-
-    .liquid-deep {
-      position: absolute;
-      top: 2px;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 35%, #075985 70%, #0c4a6e 100%);
-      overflow: hidden;
-    }
-
-    /* Floating Rising Bubbles with natural sway and pop */
-    .bubble {
-      position: absolute;
-      bottom: -8px;
-      background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.25) 50%, rgba(56, 189, 248, 0.3) 100%);
-      border: 0.5px solid rgba(255, 255, 255, 0.6);
-      border-radius: 50%;
-      box-shadow: 0 0 4px rgba(255, 255, 255, 0.25), inset -1px -1px 2px rgba(0, 0, 0, 0.2);
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .b1 { width: 6px; height: 6px; left: 18%; animation: bubble-sway-1 2.8s infinite 0.1s ease-in; }
-    .b2 { width: 9px; height: 9px; left: 42%; animation: bubble-sway-2 3.4s infinite 0.9s ease-in; }
-    .b3 { width: 5px; height: 5px; left: 68%; animation: bubble-sway-1 2.2s infinite 1.6s ease-in; }
-    .b4 { width: 8px; height: 8px; left: 28%; animation: bubble-sway-2 3.1s infinite 2.2s ease-in; }
-    .b5 { width: 7px; height: 7px; left: 78%; animation: bubble-sway-1 3.6s infinite 0.5s ease-in; }
-    .b6 { width: 4px; height: 4px; left: 52%; animation: bubble-sway-2 2.5s infinite 1.8s ease-in; }
-
-    @keyframes bubble-sway-1 {
-      0% { transform: translateY(0) translateX(0) scale(0.6); opacity: 0; }
-      20% { opacity: 0.9; transform: translateY(-25px) translateX(3px) scale(0.85); }
-      50% { transform: translateY(-65px) translateX(-3px) scale(1); }
-      80% { opacity: 0.85; transform: translateY(-105px) translateX(4px) scale(1.1); }
-      100% { transform: translateY(-135px) translateX(0) scale(1.2); opacity: 0; }
-    }
-
-    @keyframes bubble-sway-2 {
-      0% { transform: translateY(0) translateX(0) scale(0.6); opacity: 0; }
-      20% { opacity: 0.9; transform: translateY(-30px) translateX(-4px) scale(0.85); }
-      55% { transform: translateY(-70px) translateX(4px) scale(1); }
-      80% { opacity: 0.85; transform: translateY(-110px) translateX(-3px) scale(1.15); }
-      100% { transform: translateY(-135px) translateX(2px) scale(1.25); opacity: 0; }
-    }
-
-    .tank-badge-level {
-      font-size: 14px;
-      font-weight: 800;
-      color: #fff;
-      display: flex;
-      align-items: baseline;
-      gap: 3px;
-    }
-
-    .tank-badge-level span.pct {
-      font-size: 20px;
-      color: #38bdf8;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .tank-badge-sub {
-      font-size: 10px;
-      color: var(--ios-text-secondary);
-      font-weight: 600;
-    }
-
-    /* RIGHT COLUMN: POWER CONTROLS & METRICS */
-    .hero-ctrl-col {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .status-badge-liquid {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      border-radius: 100px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.4px;
-      backdrop-filter: blur(15px);
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      width: 100%;
-      justify-content: center;
-    }
-
-    .badge-idle {
-      background: rgba(142, 142, 147, 0.16);
-      color: #d1d5db;
-      border: 1px solid rgba(142, 142, 147, 0.3);
-    }
-
-    .badge-running {
-      background: rgba(52, 199, 89, 0.22);
-      color: #34c759;
-      border: 1.5px solid rgba(52, 199, 89, 0.55);
-      box-shadow: 0 0 20px rgba(52, 199, 89, 0.35);
-    }
-
-    .badge-starting {
-      background: rgba(0, 122, 255, 0.22);
-      color: #38bdf8;
-      border: 1.5px solid rgba(0, 122, 255, 0.55);
-      animation: pulse-badge 1s infinite alternate;
-    }
-
-    .badge-fault {
-      background: rgba(255, 59, 48, 0.25);
-      color: #ff453a;
-      border: 1.5px solid rgba(255, 59, 48, 0.6);
-      box-shadow: 0 0 24px rgba(255, 59, 48, 0.45);
-    }
-
-    @keyframes pulse-badge {
-      0% { opacity: 0.7; transform: scale(0.98); }
-      100% { opacity: 1; transform: scale(1.02); }
-    }
-
-    /* Glass Puck Power Button */
-    .puck-chassis {
-      position: relative;
-    }
-
-    .liquid-aura {
-      position: absolute;
-      top: -14px;
-      left: -14px;
-      right: -14px;
-      bottom: -14px;
-      border-radius: 50%;
-      background: radial-gradient(circle, var(--ios-green-glow) 0%, rgba(56, 189, 248, 0.2) 50%, transparent 70%);
-      opacity: 0;
-      filter: blur(20px);
-      transition: opacity 0.5s ease;
-      animation: fluid-pulse 3s infinite ease-in-out;
-    }
-
-    .puck-chassis.is-running .liquid-aura { opacity: 1; }
-    .puck-chassis.is-fault .liquid-aura {
-      background: radial-gradient(circle, var(--ios-red-glow) 0%, transparent 70%);
-      opacity: 1;
-      filter: blur(22px);
-    }
-
-    @keyframes fluid-pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
-    .liquid-puck-btn {
-      width: 124px;
-      height: 124px;
-      border-radius: 50%;
-      background: 
-        radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.32) 0%, transparent 50%),
-        linear-gradient(145deg, rgba(50, 52, 60, 0.78) 0%, rgba(16, 18, 24, 0.96) 100%);
-      backdrop-filter: blur(30px);
-      border: 1.5px solid rgba(255, 255, 255, 0.22);
-      border-top: 2.5px solid rgba(255, 255, 255, 0.6);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      position: relative;
-      z-index: 2;
-      box-shadow: 
-        0 16px 36px rgba(0, 0, 0, 0.75),
-        inset 0 2px 4px rgba(255, 255, 255, 0.35),
-        inset 0 -4px 8px rgba(0, 0, 0, 0.6);
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s;
-    }
-
-    .liquid-puck-btn:active { transform: scale(0.92); }
-
-    .liquid-puck-btn svg {
-      width: 42px;
-      height: 42px;
-      stroke: #ffffff;
-      transition: stroke 0.3s, transform 0.3s;
-    }
-
-    .liquid-puck-btn span {
+      background-color: var(--color-paper-3);
+      color: var(--color-ink);
+      border: var(--rule-hair) solid var(--color-rule-2);
+      border-radius: var(--radius-pill);
+      padding: 6px 12px;
       font-size: 12px;
-      font-weight: 800;
-      margin-top: 6px;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      color: var(--ios-text-secondary);
-      transition: color 0.3s;
-    }
-
-    .puck-chassis.is-running .liquid-puck-btn {
-      background: 
-        radial-gradient(circle at 35% 25%, rgba(52, 199, 89, 0.45) 0%, transparent 60%),
-        linear-gradient(145deg, rgba(20, 60, 32, 0.9) 0%, rgba(10, 30, 16, 0.98) 100%);
-      border-color: rgba(52, 199, 89, 0.65);
-      border-top-color: rgba(134, 239, 172, 0.95);
-    }
-
-    .puck-chassis.is-running .liquid-puck-btn svg {
-      stroke: #4ade80;
-      transform: scale(1.05);
-    }
-
-    .puck-chassis.is-running .liquid-puck-btn span { color: #4ade80; }
-
-    .runtime-counter {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--ios-text-secondary);
-      font-variant-numeric: tabular-nums;
-      background: rgba(255, 255, 255, 0.06);
-      padding: 4px 10px;
-      border-radius: 100px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    /* INTERACTIVE LEVEL SLIDER */
-    .slider-card {
-      padding: 14px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .slider-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--ios-text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .range-wrap {
-      position: relative;
-      width: 100%;
-      height: 24px;
-      display: flex;
-      align-items: center;
-    }
-
-    input[type=range] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 8px;
-      border-radius: 5px;
-      background: rgba(255, 255, 255, 0.12);
-      outline: none;
-      transition: background 0.2s;
-    }
-
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: #ffffff;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-      border: 1.5px solid rgba(56, 189, 248, 0.6);
-      transition: transform 0.1s;
-    }
-
-    input[type=range]::-webkit-slider-thumb:active { transform: scale(1.2); }
-
-    /* 2x2 APPLE HOME TELEMETRY TILES */
-    .metrics-2x2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .metric-tile {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 100px;
-      padding: 14px 16px;
-    }
-
-    .tile-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .tile-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--ios-text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .tile-icon-badge {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-    }
-
-    .tile-icon-badge svg {
-      width: 15px;
-      height: 15px;
-      stroke: var(--ios-cyan);
-    }
-
-    .tile-val-group { margin-top: 6px; }
-
-    .tile-num {
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: #ffffff;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .tile-unit {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--ios-text-secondary);
-      margin-left: 2px;
-    }
-
-    .tile-sub {
-      font-size: 10px;
-      color: var(--ios-text-tertiary);
-      margin-top: 2px;
       font-weight: 500;
+      cursor: pointer;
+      font-family: var(--font-display);
+      transition: background-color 0.15s ease, border-color 0.15s ease;
     }
 
-    /* SECTION HEADER */
-    .section-head {
+    .btn-key:hover {
+      background-color: var(--color-paper);
+      border-color: var(--color-ink-2);
+    }
+
+    .btn-key:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary-amber {
+      background-color: var(--color-accent);
+      color: var(--color-accent-ink);
+      border-color: var(--color-accent);
+      font-weight: 600;
+      font-size: 14px;
+      padding: 12px 24px;
+      width: 100%;
+    }
+
+    .btn-primary-amber:hover {
+      background-color: oklch(86% 0.14 80);
+      border-color: oklch(86% 0.14 80);
+    }
+
+    .btn-primary-amber.is-engaged {
+      background-color: var(--color-bad);
+      color: var(--color-ink);
+      border-color: var(--color-bad);
+    }
+
+    /* Chips & Badges */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--font-measured);
+      font-variant-numeric: tabular-nums slashed-zero;
+      border: var(--rule-hair) solid var(--color-rule-2);
+      background-color: var(--color-paper-3);
+      color: var(--color-muted);
+    }
+
+    .chip-ok {
+      border-color: var(--color-ok);
+      background-color: var(--color-ok-soft);
+      color: var(--color-ok);
+    }
+
+    .chip-bad {
+      border-color: var(--color-bad);
+      background-color: var(--color-bad-soft);
+      color: var(--color-bad);
+    }
+
+    .chip-cool {
+      border-color: var(--color-cool);
+      background-color: var(--color-cool-soft);
+      color: var(--color-cool);
+    }
+
+    .chip-amber {
+      border-color: var(--color-accent);
+      background-color: var(--color-accent-soft);
+      color: var(--color-accent);
+    }
+
+    /* Primary Hero Split Grid */
+    .hero-split {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: var(--rule-hair);
+      background-color: var(--color-rule);
+    }
+
+    @media (max-width: 580px) {
+      .hero-split {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Calibrated Industrial Sight Glass Column */
+    .sight-glass-box {
       display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sight-gauge-wrapper {
+      display: flex;
+      gap: 14px;
+      align-items: stretch;
+      height: 180px;
+    }
+
+    .ruler-ticks {
+      display: flex;
+      flex-direction: column;
       justify-content: space-between;
-      align-items: center;
-      padding: 4px 6px 0 6px;
+      align-items: flex-end;
+      width: 44px;
+      font-family: var(--font-measured);
+      font-size: 11px;
+      color: var(--color-muted);
+      padding: 4px 0;
+      user-select: none;
     }
 
-    .section-title {
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--ios-text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
+    .ruler-tick-mark {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
     }
 
-    /* CLIENT DEMONSTRATION SANDBOX */
-    .sandbox-container {
+    .ruler-tick-mark::after {
+      content: '';
+      width: 6px;
+      height: 1px;
+      background-color: var(--color-rule-2);
+    }
+
+    .ruler-tick-mark.major::after {
+      width: 10px;
+      background-color: var(--color-muted);
+    }
+
+    .glass-tube {
+      width: 42px;
+      background-color: var(--color-paper-3);
+      border: var(--rule-hair) solid var(--color-rule-2);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .liquid-column {
+      width: 100%;
+      height: 65%;
+      background-color: var(--color-cool-soft);
+      border-top: 2px solid var(--color-cool);
+      transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .liquid-column::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background-color: var(--color-cool);
+      box-shadow: 0 0 6px var(--color-cool);
+    }
+
+    /* Non-Contact Foil Sensor Marker */
+    .foil-electrode-band {
+      position: absolute;
+      top: 14px;
+      right: -1px;
+      width: 6px;
+      height: 22px;
+      background-color: var(--color-accent);
+      border: 1px solid var(--color-accent-ink);
+      border-right: none;
+      border-radius: 2px 0 0 2px;
+      z-index: 5;
+    }
+
+    .sight-gauge-meta {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Motor Control & Telemetry Panel */
+    .motor-ctrl-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .state-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background-color: var(--color-paper-3);
+      border: var(--rule-hair) solid var(--color-rule);
+      border-radius: var(--radius-pill);
+    }
+
+    .state-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-ink);
+    }
+
+    .runtime-display {
+      font-family: var(--font-measured);
+      font-size: 12px;
+      color: var(--color-muted);
+    }
+
+    .readings-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* 4-Cell Telemetry Grid */
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--rule-hair);
+      background-color: var(--color-rule);
+    }
+
+    @media (max-width: 580px) {
+      .telemetry-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .telemetry-cell {
+      background-color: var(--color-paper-2);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 72px;
+    }
+
+    .telemetry-cell .cell-val {
+      font-family: var(--font-measured);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--color-ink);
+      margin-top: 4px;
+    }
+
+    .telemetry-cell .cell-sub {
+      font-size: 11px;
+      color: var(--color-muted);
+      margin-top: 2px;
+    }
+
+    /* Range Slider for Level Inspection */
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background-color: var(--color-paper-3);
+      padding: 10px 14px;
+      border: var(--rule-hair) solid var(--color-rule);
+      border-radius: var(--radius-pill);
+    }
+
+    .slider-row input[type=range] {
+      flex: 1;
+      height: 4px;
+      background: var(--color-rule-2);
+      border-radius: 2px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .slider-row input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--color-ink);
+      border: 2px solid var(--color-accent);
+      cursor: pointer;
+    }
+
+    /* Operator Test Bench (Hallmark Simulation Keys) */
+    .testbench-panel {
+      display: flex;
+      flex-direction: column;
       gap: 10px;
     }
 
-    .sandbox-card-btn {
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%), rgba(20, 24, 34, 0.5);
-      backdrop-filter: blur(25px);
-      border: 1px solid var(--ios-border);
-      border-top: 1.5px solid rgba(255, 255, 255, 0.28);
-      border-radius: 18px;
-      padding: 12px 14px;
-      color: #fff;
+    .testbench-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    @media (max-width: 580px) {
+      .testbench-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .btn-test {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      align-items: flex-start;
+      gap: 2px;
+      background-color: var(--color-paper-3);
+      border: var(--rule-hair) solid var(--color-rule);
+      border-radius: var(--radius-pill);
+      padding: 10px 12px;
+      color: var(--color-ink);
       cursor: pointer;
       text-align: left;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+      font-family: var(--font-display);
     }
 
-    .sandbox-card-btn:active {
-      transform: scale(0.96);
-      background: rgba(255, 255, 255, 0.14);
+    .btn-test:hover {
+      background-color: var(--color-paper);
+      border-color: var(--color-rule-2);
     }
 
-    .sandbox-card-btn .btn-head {
-      font-size: 12px;
-      font-weight: 800;
+    .btn-test:active {
+      transform: translateY(1px);
+    }
+
+    .btn-test .test-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-ink);
+    }
+
+    .btn-test .test-sub {
+      font-size: 11px;
+      color: var(--color-muted);
+    }
+
+    /* Real-Time Audit Ledger */
+    .audit-panel {
       display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .sandbox-card-btn .btn-desc {
-      font-size: 10px;
-      color: var(--ios-text-secondary);
-      line-height: 1.35;
-    }
-
-    .sandbox-card-btn.full-span {
-      grid-column: span 2;
-      background: rgba(52, 199, 89, 0.16);
-      border-color: rgba(52, 199, 89, 0.45);
-      text-align: center;
-      align-items: center;
-      padding: 13px;
-    }
-
-    /* WIRELESS OTA CLOUD CARD */
-    .ota-track {
-      width: 100%;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      overflow: hidden;
-      margin: 10px 0 6px 0;
-    }
-
-    .ota-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #38bdf8, #818cf8);
-      border-radius: 10px;
-      transition: width 0.15s ease;
-    }
-
-    /* APPLE TOAST BANNER */
-    .ios-toast {
-      position: fixed;
-      top: 18px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-100px);
-      background: rgba(24, 28, 38, 0.92);
-      backdrop-filter: blur(28px) saturate(200%);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      border-top: 1px solid rgba(255, 255, 255, 0.5);
-      border-radius: 100px;
-      padding: 10px 20px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #fff;
-      display: flex;
-      align-items: center;
+      flex-direction: column;
       gap: 8px;
-      box-shadow: 0 16px 36px rgba(0,0,0,0.7);
-      z-index: 100;
-      opacity: 0;
-      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-      pointer-events: none;
-      max-width: 90%;
     }
 
-    .ios-toast.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
+    .audit-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-measured);
+      font-size: 12px;
+    }
+
+    .audit-table th {
+      text-align: left;
+      font-weight: 400;
+      color: var(--color-muted);
+      border-bottom: var(--rule-hair) solid var(--color-rule);
+      padding: 4px 8px 6px 8px;
+    }
+
+    .audit-table td {
+      padding: 6px 8px;
+      border-bottom: var(--rule-hair) solid oklch(24% 0.009 250);
+      color: var(--color-ink-2);
+      vertical-align: middle;
+    }
+
+    .audit-table tr:first-child td {
+      color: var(--color-ink);
+    }
+
+    .audit-tag {
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      border: 1px solid var(--color-rule-2);
+      color: var(--color-muted);
+    }
+
+    .audit-tag.operator { border-color: var(--color-accent); color: var(--color-accent); }
+    .audit-tag.sensor { border-color: var(--color-cool); color: var(--color-cool); }
+    .audit-tag.fault { border-color: var(--color-bad); color: var(--color-bad); }
+
+    /* Footer Stamp */
+    .console-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--color-muted);
+      padding: 0 4px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Ambient Glowing Background Orbs -->
-  <div class="ambient-orb orb-1"></div>
-  <div class="ambient-orb orb-2"></div>
+  <main class="console-shell">
 
-  <!-- Apple Toast Dropdown -->
-  <div class="ios-toast" id="iosToast">
-    <span id="toastIcon">ℹ️</span>
-    <span id="toastText">Notification</span>
-  </div>
-
-  <div class="app-viewport">
-
-    <!-- Apple Dynamic Island HUD -->
-    <div class="island-container">
-      <div class="dynamic-island" id="dynamicIsland" onclick="onIslandClick()">
-        <span class="island-dot" id="islandDot"></span>
-        <div class="island-text" id="islandText">
-          <span>250m ESP-NOW LR</span>
-          <span class="island-subtag" id="islandSubtag">STANDBY</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Header Brand Bar -->
-    <div class="header-bar">
+    <!-- Top Header Panel -->
+    <header class="header-panel">
       <div>
-        <div class="brand-title">
-          Smart Pump
-          <span class="badge-chip">PRO 250m</span>
-        </div>
-        <div class="brand-sub">Dual ESP32 LR • Single Phase Contactor</div>
+        <h1 class="brand-title">Smart Pump</h1>
+        <p class="brand-desc">250m ESP-NOW LR wireless pump &amp; overhead tank controller</p>
       </div>
       <div class="header-actions">
-        <div class="liquid-pill active-mode" id="netPill" onclick="toggleNetMode()">
-          <span class="island-dot" style="width:6px; height:6px;"></span>
-          <span id="netText">Local Link</span>
-        </div>
-        <div class="liquid-pill" id="soundPill" onclick="toggleSound()">
-          <span id="soundIcon">🔊</span>
-        </div>
+        <button class="btn-key" id="audioToggleBtn" onclick="toggleAudio()" title="Toggle Web Audio feedback">
+          <span id="audioStatusText">Audio: Active</span>
+        </button>
+        <span class="chip chip-ok" id="linkChip">Link: 250m OK</span>
       </div>
-    </div>
+    </header>
 
-    <!-- PRIMARY HERO CARD: WATER TANK + POWER PUCK -->
-    <div class="liquid-card">
-      <div class="hero-split-grid">
-        
-        <!-- LEFT: LIQUID TANK VESSEL -->
-        <div class="tank-chassis">
-          <div class="tank-cylinder">
-            <div class="inflow-pipe"></div>
-            <div class="inflow-stream" id="inflowStream"></div>
-            <div class="foil-sensor-tape" title="Contactless Aluminum Foil Capacitive Sensor"></div>
+    <!-- Main Instrument Panels -->
+    <div class="panels">
 
-            <div class="tank-scale-lines">
-              <div class="scale-mark"></div>
-              <div class="scale-mark"></div>
-              <div class="scale-mark"></div>
-              <div class="scale-mark"></div>
-              <div class="scale-mark"></div>
+      <!-- HERO SECTION: CALIBRATED SIGHT GLASS + MOTOR DRIVE -->
+      <div class="hero-split">
+
+        <!-- Left: Calibrated Liquid Sight Glass -->
+        <section class="sight-glass-box" aria-label="Liquid Sight Glass">
+          <div class="label">Overhead tank liquid level</div>
+
+          <div class="sight-gauge-wrapper">
+            <div class="ruler-ticks" aria-hidden="true">
+              <div class="ruler-tick-mark major">5.0 ft</div>
+              <div class="ruler-tick-mark">4.0 ft</div>
+              <div class="ruler-tick-mark major">3.0 ft</div>
+              <div class="ruler-tick-mark">2.0 ft</div>
+              <div class="ruler-tick-mark major">1.0 ft</div>
+              <div class="ruler-tick-mark">0.0 ft</div>
             </div>
 
-            <div class="liquid-body" id="liquidBody">
-              <!-- Dual Horizontal Sine Waves (Translation Only, No Spinning) -->
-              <div class="wave-svg-box">
-                <svg class="liquid-wave-strip" viewBox="0 0 400 30" preserveAspectRatio="none">
-                  <path class="wave-back" d="M0,10 C35,18 65,18 100,10 C135,2 165,2 200,10 C235,18 265,18 300,10 C335,2 365,2 400,10 L400,30 L0,30 Z"></path>
-                  <path class="wave-front" d="M0,15 C35,6 65,6 100,15 C135,24 165,24 200,15 C235,6 265,6 300,15 C335,24 365,24 400,15 L400,30 L0,30 Z"></path>
-                </svg>
+            <div class="glass-tube">
+              <div class="foil-electrode-band" title="Non-contact aluminum foil touch electrode at 5.0 ft overflow point"></div>
+              <div class="liquid-column" id="liquidColumn"></div>
+            </div>
+
+            <div class="sight-gauge-meta">
+              <div>
+                <div class="measured-lg" id="tankLevelText">65<span class="measured-unit">%</span></div>
+                <div class="label" id="tankDepthText" style="margin-top:2px;">3.25 ft / 5.0 ft capacity</div>
               </div>
-              <div class="liquid-deep">
-                <!-- 6 Swaying Rising Air Bubbles -->
-                <div class="bubble b1"></div>
-                <div class="bubble b2"></div>
-                <div class="bubble b3"></div>
-                <div class="bubble b4"></div>
-                <div class="bubble b5"></div>
-                <div class="bubble b6"></div>
+
+              <div>
+                <div class="label">Contactless foil</div>
+                <div class="chip chip-cool" id="foilChip">Armed (+184 pF)</div>
+              </div>
+
+              <div>
+                <div class="label">Estimated fill time</div>
+                <div class="measured" id="estFillText" style="font-size:13px; color:var(--color-ink);">14 minutes</div>
               </div>
             </div>
           </div>
+        </section>
 
-          <div class="tank-badge-level">
-            <span class="pct" id="tankLevelPct">65%</span>
-            <span class="tank-badge-sub" id="tankDepthFt">3.3 ft</span>
-          </div>
-          <div class="tank-badge-sub" id="tankEstMins">~14 Mins to Full</div>
-        </div>
-
-        <!-- RIGHT: PUMP CONTROL PUCK -->
-        <div class="hero-ctrl-col">
-          <div class="status-badge-liquid badge-idle" id="pumpBadge">
-            ● STANDBY / READY
+        <!-- Right: Motor Drive Contactor Controls -->
+        <section class="motor-ctrl-box" aria-label="Motor Drive Controller">
+          <div class="state-banner">
+            <div>
+              <div class="label">Drive state</div>
+              <div class="state-title" id="motorStateTitle">Standby / Ready</div>
+            </div>
+            <div class="runtime-display" id="runtimeDisplay">00:00:00</div>
           </div>
 
-          <div class="puck-chassis" id="puckChassis">
-            <div class="liquid-aura"></div>
-            <button class="liquid-puck-btn" id="puckBtn" onclick="onPuckClick()">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
-                <line x1="12" y1="2" x2="12" y2="12"></line>
-              </svg>
-              <span id="puckBtnLabel">START</span>
+          <div class="readings-row">
+            <div>
+              <div class="label">True-RMS load</div>
+              <div class="measured-lg" id="currentAmpsText">0.0<span class="measured-unit">A</span></div>
+              <div class="label" style="font-size:11px; margin-top:2px;">10.0 A rated motor</div>
+            </div>
+
+            <div>
+              <div class="label">Active power</div>
+              <div class="measured-lg" id="activeKwText">0.00<span class="measured-unit">kW</span></div>
+              <div class="label" style="font-size:11px; margin-top:2px;">230 V line · PF 0.88</div>
+            </div>
+          </div>
+
+          <div>
+            <button class="btn-key btn-primary-amber" id="pumpMainBtn" onclick="onEngageClick()">
+              Engage Pump
             </button>
           </div>
-
-          <div class="runtime-counter" id="runtimeClock">Runtime: 00:00:00</div>
-        </div>
+        </section>
 
       </div>
-    </div>
 
-    <!-- TANK LEVEL ADJUSTMENT SLIDER -->
-    <div class="liquid-card slider-card">
-      <div class="slider-header">
-        <span>Interactive Water Level</span>
-        <span style="color:#38bdf8;" id="sliderValDisplay">65% (Tap/Drag to simulate)</span>
-      </div>
-      <div class="range-wrap">
-        <input type="range" id="tankSlider" min="0" max="100" value="65" oninput="onSliderChange(this.value)">
-      </div>
-    </div>
+      <!-- INTERACTIVE LEVEL CALIBRATION / INSPECTION -->
+      <section style="padding: 10px 18px;">
+        <div class="slider-row">
+          <span class="label" style="margin:0; white-space:nowrap;">Inspect tank depth:</span>
+          <input type="range" id="levelSlider" min="0" max="100" value="65" oninput="onSliderAdjust(this.value)">
+          <span class="measured" id="sliderValLabel" style="font-size:12px; min-width:40px; text-align:right;">65%</span>
+        </div>
+      </section>
 
-    <!-- 2x2 TELEMETRY GRID -->
-    <div class="metrics-2x2">
-      <div class="liquid-card metric-tile">
-        <div class="tile-top">
-          <span class="tile-title">Motor Load</span>
-          <div class="tile-icon-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-          </div>
+      <!-- 4-CELL TELEMETRY SEAMED GRID -->
+      <div class="telemetry-grid">
+        <div class="telemetry-cell">
+          <div class="label">ZMCT103C sensing</div>
+          <div class="cell-val" id="ctStatusVal">0.0 A</div>
+          <div class="cell-sub">Isolated secondary CT</div>
         </div>
-        <div class="tile-val-group">
-          <span class="tile-num" id="currentNum">0.0</span>
-          <span class="tile-unit">A</span>
-          <div class="tile-sub">10.0A Rated Induction</div>
-        </div>
-      </div>
 
-      <div class="liquid-card metric-tile">
-        <div class="tile-top">
-          <span class="tile-title">Power Draw</span>
-          <div class="tile-icon-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-          </div>
+        <div class="telemetry-cell">
+          <div class="label">Contactor loop</div>
+          <div class="cell-val" id="contactorVal">Latched</div>
+          <div class="cell-sub">Relay 1 NC series line</div>
         </div>
-        <div class="tile-val-group">
-          <span class="tile-num" id="powerNum">0.00</span>
-          <span class="tile-unit">kW</span>
-          <div class="tile-sub">230V AC Single-Phase</div>
+
+        <div class="telemetry-cell">
+          <div class="label">250m ESP-NOW LR</div>
+          <div class="cell-val" id="rssiVal">-62 dBm</div>
+          <div class="cell-sub">+18 dB link budget</div>
+        </div>
+
+        <div class="telemetry-cell">
+          <div class="label">Relay 2 start coil</div>
+          <div class="cell-val" id="startPulseVal">Ready</div>
+          <div class="cell-sub">1.8s momentary pulse</div>
         </div>
       </div>
 
-      <div class="liquid-card metric-tile">
-        <div class="tile-top">
-          <span class="tile-title">Contactor NC</span>
-          <div class="tile-icon-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-          </div>
+      <!-- OPERATOR TEST BENCH (SAFETY CUTOFF SIMULATION) -->
+      <section class="testbench-panel">
+        <div class="label">Operator test bench · Hardware failsafe verification</div>
+
+        <div class="testbench-grid">
+          <button class="btn-test" onclick="simulateDryRun()">
+            <span class="test-title">Simulate borewell dry-run</span>
+            <span class="test-sub">Current drops below 4.0 A &rarr; 8s thermal timer trip</span>
+          </button>
+
+          <button class="btn-test" onclick="simulateOverload()">
+            <span class="test-title">Simulate motor jam / surge</span>
+            <span class="test-sub">Current spikes past 16.0 A &rarr; sub-100ms hardware interrupt</span>
+          </button>
+
+          <button class="btn-test" onclick="simulateOverflow()">
+            <span class="test-title">Simulate contactless foil full</span>
+            <span class="test-sub">Water touches outside tape &rarr; delta-C cutoff &amp; victory chime</span>
+          </button>
+
+          <button class="btn-test" onclick="simulateLinkLoss()">
+            <span class="test-title">Simulate 250m link loss</span>
+            <span class="test-sub">Heartbeat timeout &rarr; 3-minute receiver watchdog shutdown</span>
+          </button>
         </div>
-        <div class="tile-val-group">
-          <span class="tile-num" id="relay1Num" style="font-size:18px;">CLOSED</span>
-          <div class="tile-sub">Holding Loop Ready</div>
+
+        <div style="margin-top: 4px;">
+          <button class="btn-key" style="width: 100%; padding: 8px;" onclick="resetInstrument()">
+            Reset instrument state &amp; clear safety latches
+          </button>
         </div>
-      </div>
+      </section>
 
-      <div class="liquid-card metric-tile">
-        <div class="tile-top">
-          <span class="tile-title">250m ESP-NOW</span>
-          <div class="tile-icon-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
-          </div>
-        </div>
-        <div class="tile-val-group">
-          <span class="tile-num" id="radioNum">-62</span>
-          <span class="tile-unit">dBm</span>
-          <div class="tile-sub">LR Link Margin +18dB</div>
-        </div>
-      </div>
-    </div>
+      <!-- AUDIT LEDGER (HARDWARE EVENT CHRONOLOGY) -->
+      <section class="audit-panel">
+        <div class="label">Event audit trail · Subsystem record</div>
 
-    <!-- CLIENT DEMONSTRATION SECTION -->
-    <div class="section-head">
-      <div class="section-title">
-        <span>⚡</span> Client Safety Demonstrations
-      </div>
-    </div>
+        <table class="audit-table">
+          <thead>
+            <tr>
+              <th style="width: 65px;">Time</th>
+              <th style="width: 90px;">Source</th>
+              <th>Recorded event description</th>
+              <th style="width: 80px; text-align:right;">State</th>
+            </tr>
+          </thead>
+          <tbody id="auditTableBody">
+            <tr>
+              <td class="measured">00:00:00</td>
+              <td><span class="audit-tag sensor">INIT</span></td>
+              <td>Dual ESP32 nodes synchronized via 250m LR link</td>
+              <td style="text-align:right;"><span class="chip chip-ok" style="padding:1px 5px;">OK</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
 
-    <div class="sandbox-container">
-      <button class="sandbox-card-btn" onclick="triggerDryRun()">
-        <span class="btn-head">⚠️ Borewell Dry-Run</span>
-        <span class="btn-desc">Current drops &lt; 4.0A &rarr; 8s auto-cutoff protection</span>
-      </button>
-
-      <button class="sandbox-card-btn" onclick="triggerMotorJam()">
-        <span class="btn-head">🚨 Overload / Jam</span>
-        <span class="btn-desc">Current surges &gt; 16A &rarr; Instant trip &lt; 100ms</span>
-      </button>
-
-      <button class="sandbox-card-btn" onclick="triggerOverflow()">
-        <span class="btn-head">💧 Tank Overflow</span>
-        <span class="btn-desc">Foil trips &rarr; Victory Fanfare &amp; auto-stop</span>
-      </button>
-
-      <button class="sandbox-card-btn" onclick="triggerWatchdog()">
-        <span class="btn-head">📡 250m Link Loss</span>
-        <span class="btn-desc">Heartbeat timeout &rarr; 3-min Watchdog failsafe</span>
-      </button>
-
-      <button class="sandbox-card-btn full-span" onclick="triggerReset()">
-        <span style="font-size:13px; font-weight:800; color:#4ade80;">🔄 Reset All Systems to Standby</span>
-      </button>
-    </div>
-
-    <!-- WIRELESS OTA CLOUD CARD -->
-    <div class="liquid-card">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
+      <!-- WIRELESS OTA FIRMWARE PANEL -->
+      <section style="display:flex; justify-content:space-between; align-items:center; padding:12px 18px;">
         <div>
-          <div style="font-size:13px; font-weight:800;">Cloud &amp; Wireless OTA</div>
-          <div style="font-size:11px; color:var(--ios-text-secondary);">HiveMQ TLS Free Tier &bull; v2.4.0 Active</div>
+          <div class="label">Firmware deployment</div>
+          <div style="font-size:13px; color:var(--color-ink);">Installed: v2.4.0-stable &bull; Remote: v2.5.0-ready (GitHub Releases)</div>
         </div>
-        <button class="liquid-pill" style="background:rgba(56,189,248,0.18); border-color:rgba(56,189,248,0.45); color:#38bdf8;" onclick="triggerOTA()">
-          ⚡ Flash v2.5.0
+        <button class="btn-key" id="otaBtn" onclick="runOTAUpdate()">
+          Trigger Wireless OTA
         </button>
-      </div>
+      </section>
 
-      <div class="ota-track">
-        <div class="ota-fill" id="otaBar"></div>
-      </div>
-      <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--ios-text-tertiary);">
-        <span id="otaStatusLbl">Standby: v2.5.0 ready on GitHub Releases</span>
-        <span id="otaPctLbl">0%</span>
-      </div>
     </div>
 
-  </div>
+    <!-- Footer Stamp -->
+    <footer class="console-footer">
+      <span>Smart Pump Automation &bull; Project EVO HA 12.53</span>
+      <span>Hallmark Console &bull; Hardware Specimen Grade</span>
+    </footer>
+
+  </main>
 
   <script>
     // State Variables
     let isRunning = false;
     let isStarting = false;
-    let currentFault = null;
+    let activeFault = null;
     let currentAmps = 0.0;
-    let currentTankLevel = 65;
-    let runSeconds = 0;
-    let runTimer = null;
-    let jitterTimer = null;
-    let soundOn = true;
-    let isLocal = true;
+    let tankLevelPct = 65;
+    let runtimeSec = 0;
+    let runInterval = null;
+    let jitterInterval = null;
+    let audioActive = true;
 
-    // Web Audio Synthesizer (Realistic Apple Haptics + Melodies)
-    let audioContext = null;
+    // Web Audio Synthesizer (Precision Clean Harmonic Tones)
+    let audioCtx = null;
 
-    function getAudio() {
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
-      if (audioContext.state === 'suspended') {
-        audioContext.resume();
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
       }
-      return audioContext;
+      return audioCtx;
     }
 
-    // Tactile iPhone Taptic Engine click sound
-    function soundHaptic() {
-      if (!soundOn) return;
+    function playTone(freq, durationMs, delayMs = 0, type = 'sine', gainVal = 0.08) {
+      if (!audioActive) return;
       try {
-        const ctx = getAudio();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(140, ctx.currentTime);
-        gain.gain.setValueAtTime(0.08, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.04);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.04);
-      } catch (e) {}
-    }
-
-    function soundBeep(freq, ms, delay = 0, type = 'sine', vol = 0.09) {
-      if (!soundOn) return;
-      try {
-        const ctx = getAudio();
+        const ctx = getAudioContext();
         setTimeout(() => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = type;
           osc.frequency.setValueAtTime(freq, ctx.currentTime);
-          gain.gain.setValueAtTime(vol, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + (ms / 1000));
+          gain.gain.setValueAtTime(gainVal, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + (durationMs / 1000));
           osc.connect(gain);
           gain.connect(ctx.destination);
           osc.start();
-          osc.stop(ctx.currentTime + (ms / 1000));
-        }, delay);
+          osc.stop(ctx.currentTime + (durationMs / 1000));
+        }, delayMs);
       } catch (e) {}
     }
 
-    function chimeStart() {
-      soundBeep(523, 80, 0, 'sine', 0.1);
-      soundBeep(659, 80, 100, 'sine', 0.1);
-      soundBeep(784, 100, 200, 'sine', 0.12);
-      soundBeep(1046, 220, 320, 'sine', 0.15);
+    function soundKeypress() {
+      playTone(180, 25, 0, 'sine', 0.05);
     }
 
-    function chimeStop() {
-      soundBeep(784, 90, 0, 'sine', 0.1);
-      soundBeep(659, 90, 110, 'sine', 0.1);
-      soundBeep(523, 200, 220, 'sine', 0.12);
+    function soundEngage() {
+      playTone(440, 60, 0, 'sine', 0.08);
+      playTone(660, 80, 80, 'sine', 0.08);
+      playTone(880, 160, 180, 'sine', 0.1);
     }
 
-    function chimeFanfare() {
-      soundBeep(523, 100, 0, 'sine', 0.12);
-      soundBeep(659, 100, 120, 'sine', 0.12);
-      soundBeep(784, 100, 240, 'sine', 0.14);
-      soundBeep(1046, 300, 360, 'sine', 0.18);
-      soundBeep(784, 100, 700, 'sine', 0.12);
-      soundBeep(1046, 400, 820, 'sine', 0.18);
+    function soundDisengage() {
+      playTone(660, 60, 0, 'sine', 0.08);
+      playTone(440, 140, 80, 'sine', 0.08);
     }
 
-    function chimeAlarm() {
-      for (let i = 0; i < 4; i++) {
-        soundBeep(2100, 70, i * 130, 'square', 0.08);
+    function soundVictory() {
+      playTone(523, 80, 0, 'sine', 0.09);
+      playTone(659, 80, 100, 'sine', 0.09);
+      playTone(784, 90, 200, 'sine', 0.1);
+      playTone(1046, 260, 310, 'sine', 0.14);
+    }
+
+    function soundAlarm() {
+      for (let i = 0; i < 3; i++) {
+        playTone(1800, 60, i * 120, 'square', 0.06);
       }
     }
 
-    // Apple Toast Notification
-    function showToast(icon, text) {
-      const toast = document.getElementById('iosToast');
-      document.getElementById('toastIcon').innerText = icon;
-      document.getElementById('toastText').innerText = text;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3200);
+    function toggleAudio() {
+      audioActive = !audioActive;
+      const text = document.getElementById('audioStatusText');
+      text.innerText = audioActive ? 'Audio: Active' : 'Audio: Muted';
+      if (audioActive) soundKeypress();
     }
 
-    // Toggle Sound
-    function toggleSound() {
-      soundOn = !soundOn;
-      document.getElementById('soundIcon').innerText = soundOn ? '🔊' : '🔇';
-      if (soundOn) {
-        soundHaptic();
-        showToast('🔊', 'Web Audio Synthesizer Enabled');
-      } else {
-        showToast('🔇', 'Audio Muted');
+    // Audit Trail Logger
+    function logEvent(source, sourceClass, message, stateText, stateChipClass = 'chip') {
+      const tbody = document.getElementById('auditTableBody');
+      const row = document.createElement('tr');
+
+      const h = String(Math.floor(runtimeSec / 3600)).padStart(2, '0');
+      const m = String(Math.floor((runtimeSec % 3600) / 60)).padStart(2, '0');
+      const s = String(runtimeSec % 60).padStart(2, '0');
+      const timeStr = `${h}:${m}:${s}`;
+
+      row.innerHTML = `
+        <td class="measured">${timeStr}</td>
+        <td><span class="audit-tag ${sourceClass}">${source}</span></td>
+        <td>${message}</td>
+        <td style="text-align:right;"><span class="${stateChipClass}" style="padding:1px 5px;">${stateText}</span></td>
+      `;
+
+      tbody.insertBefore(row, tbody.firstChild);
+      if (tbody.children.length > 8) {
+        tbody.removeChild(tbody.lastChild);
       }
     }
 
-    // Toggle Network Mode
-    function toggleNetMode() {
-      soundHaptic();
-      isLocal = !isLocal;
-      const pill = document.getElementById('netPill');
-      const text = document.getElementById('netText');
-      if (isLocal) {
-        pill.className = 'liquid-pill active-mode';
-        text.innerText = 'Local Link';
-        showToast('📶', 'Connected directly via 250m ESP-NOW LR');
-      } else {
-        pill.className = 'liquid-pill';
-        text.innerText = 'Cloud MQTT';
-        showToast('☁️', 'Routed via HiveMQ Cloud (Internet)');
-      }
-    }
-
-    // Dynamic Island Interaction
-    function onIslandClick() {
-      soundHaptic();
-      if (currentFault) {
-        showToast('🚨', `Safety Cutoff Active: ${currentFault}. Reset system below.`);
-      } else if (isRunning) {
-        showToast('💧', `Motor running at ${currentAmps.toFixed(1)}A &bull; Tank at ${Math.round(currentTankLevel)}%`);
-      } else {
-        showToast('🟢', 'Dual ESP32 Link: -62 dBm LR Margin (+18dB Signal)');
-      }
-    }
-
-    function updateDynamicIsland(status, mode = 'idle') {
-      const island = document.getElementById('dynamicIsland');
-      const dot = document.getElementById('islandDot');
-      const text = document.getElementById('islandText');
-
-      if (mode === 'running') {
-        island.className = 'dynamic-island is-expanded';
-        dot.className = 'island-dot';
-        text.innerHTML = `<span>💧 Pumping</span> <span class="island-subtag">${currentAmps.toFixed(1)}A &bull; ${Math.round(currentTankLevel)}%</span>`;
-      } else if (mode === 'starting') {
-        island.className = 'dynamic-island is-expanded';
-        dot.className = 'island-dot blue';
-        text.innerHTML = `<span>⚡ Starting</span> <span class="island-subtag">1.8s Pulse</span>`;
-      } else if (mode === 'fault') {
-        island.className = 'dynamic-island is-fault';
-        dot.className = 'island-dot red';
-        text.innerHTML = `<span>🚨 TRIP</span> <span class="island-subtag">${status}</span>`;
-      } else {
-        island.className = 'dynamic-island';
-        dot.className = 'island-dot';
-        text.innerHTML = `<span>250m ESP-NOW LR</span> <span class="island-subtag">STANDBY</span>`;
-      }
-    }
-
-    // Power Puck Click
-    function onPuckClick() {
-      soundHaptic();
-      if (currentFault) {
-        chimeAlarm();
-        showToast('🚨', `Cannot Start: ${currentFault} trip active! Tap Reset first.`);
+    // Engagement Control
+    function onEngageClick() {
+      soundKeypress();
+      if (activeFault) {
+        soundAlarm();
+        logEvent('SAFETY', 'fault', `Interlock active: ${activeFault}. Reset required before start.`, 'LOCKED', 'chip chip-bad');
         return;
       }
+
       if (isRunning || isStarting) {
-        stopPump();
+        disengagePump('Operator manual cut');
       } else {
-        startPump();
+        engagePump();
       }
     }
 
-    function startPump() {
+    function engagePump() {
       isStarting = true;
-      chimeStart();
-      updateDynamicIsland('Starting...', 'starting');
+      soundEngage();
 
-      showToast('⚡', 'Relay 2 Start Pulse Fired (1.8s)');
+      const btn = document.getElementById('pumpMainBtn');
+      btn.innerText = 'Starting (1.8s coil pulse)...';
+      btn.className = 'btn-key btn-primary-amber is-engaged';
 
-      const badge = document.getElementById('pumpBadge');
-      badge.className = 'status-badge-liquid badge-starting';
-      badge.innerText = '● STARTING (1.8s PULSE)...';
+      const title = document.getElementById('motorStateTitle');
+      title.innerText = '1.8s start pulse firing';
+      title.style.color = 'var(--color-accent)';
 
-      currentAmps = 28.4; // Initial inrush
-      renderMetrics();
+      document.getElementById('startPulseVal').innerText = '1.8s ON';
+      document.getElementById('startPulseVal').style.color = 'var(--color-accent)';
+
+      currentAmps = 28.4;
+      renderTelemetry();
+
+      logEvent('OPERATOR', 'operator', 'Start command issued: Relay 2 start-winding pulse energized', 'STARTING', 'chip chip-amber');
 
       setTimeout(() => {
         isStarting = false;
         isRunning = true;
-        currentAmps = 10.2; // Continuous 10A induction pump load
-        badge.className = 'status-badge-liquid badge-running';
-        badge.innerText = '● 10A MOTOR RUNNING';
+        currentAmps = 10.2;
 
-        document.getElementById('puckChassis').className = 'puck-chassis is-running';
-        document.getElementById('puckBtnLabel').innerText = 'STOP';
-        document.getElementById('inflowStream').classList.add('active');
+        btn.innerText = 'Cut Pump (Disengage)';
+        title.innerText = 'Motor running normally (10.2 A RMS)';
+        title.style.color = 'var(--color-ok)';
 
-        updateDynamicIsland('Running', 'running');
+        document.getElementById('startPulseVal').innerText = 'Ready (OFF)';
+        document.getElementById('startPulseVal').style.color = 'var(--color-ink)';
+
+        document.getElementById('contactorVal').innerText = 'Latched NC';
+        document.getElementById('contactorVal').style.color = 'var(--color-ok)';
+
         startTimers();
-        showToast('✅', 'Contactor Latched! Motor running smoothly at 10.2A');
+        renderTelemetry();
+        logEvent('CONTACTOR', 'sensor', 'Auxiliary holding line latched: 10.2A steady-state current verified', 'RUNNING', 'chip chip-ok');
       }, 1800);
     }
 
-    function stopPump() {
+    function disengagePump(reason = 'Operator cut') {
       isRunning = false;
       isStarting = false;
       currentAmps = 0.0;
-      chimeStop();
+      soundDisengage();
 
-      const badge = document.getElementById('pumpBadge');
-      badge.className = 'status-badge-liquid badge-idle';
-      badge.innerText = '● STANDBY / READY';
+      const btn = document.getElementById('pumpMainBtn');
+      btn.innerText = 'Engage Pump';
+      btn.className = 'btn-key btn-primary-amber';
 
-      document.getElementById('puckChassis').className = 'puck-chassis';
-      document.getElementById('puckBtnLabel').innerText = 'START';
-      document.getElementById('inflowStream').classList.remove('active');
+      const title = document.getElementById('motorStateTitle');
+      title.innerText = activeFault ? `Fault trip: ${activeFault}` : 'Standby / Ready';
+      title.style.color = activeFault ? 'var(--color-bad)' : 'var(--color-ink)';
 
-      if (!currentFault) updateDynamicIsland('Standby', 'idle');
+      document.getElementById('contactorVal').innerText = 'De-energized';
+      document.getElementById('contactorVal').style.color = 'var(--color-muted)';
+
       stopTimers();
-      renderMetrics();
-      showToast('⏹', 'Relay 1 Opened: Contactor de-energized');
+      renderTelemetry();
+      logEvent('RELAY 1', 'operator', `Holding line opened: ${reason}`, 'STANDBY', 'chip');
     }
 
     function startTimers() {
       stopTimers();
 
-      runTimer = setInterval(() => {
-        runSeconds++;
-        const h = String(Math.floor(runSeconds / 3600)).padStart(2, '0');
-        const m = String(Math.floor((runSeconds % 3600) / 60)).padStart(2, '0');
-        const s = String(runSeconds % 60).padStart(2, '0');
-        document.getElementById('runtimeClock').innerText = `Runtime: ${h}:${m}:${s}`;
+      runInterval = setInterval(() => {
+        runtimeSec++;
+        const h = String(Math.floor(runtimeSec / 3600)).padStart(2, '0');
+        const m = String(Math.floor((runtimeSec % 3600) / 60)).padStart(2, '0');
+        const s = String(runtimeSec % 60).padStart(2, '0');
+        document.getElementById('runtimeDisplay').innerText = `${h}:${m}:${s}`;
 
-        if (currentTankLevel < 100) {
-          currentTankLevel = Math.min(100, currentTankLevel + 0.3);
-          renderTank();
-          updateDynamicIsland('Running', 'running');
+        if (tankLevelPct < 100) {
+          tankLevelPct = Math.min(100, tankLevelPct + 0.35);
+          renderSightGlass();
         } else {
-          triggerOverflow();
+          simulateOverflow();
         }
       }, 1000);
 
-      jitterTimer = setInterval(() => {
-        if (isRunning && !currentFault) {
+      jitterInterval = setInterval(() => {
+        if (isRunning && !activeFault) {
           const jitter = (Math.random() * 0.3 - 0.15);
           currentAmps = parseFloat((10.2 + jitter).toFixed(1));
-          renderMetrics();
+          renderTelemetry();
         }
-      }, 800);
+      }, 700);
     }
 
     function stopTimers() {
-      clearInterval(runTimer);
-      clearInterval(jitterTimer);
+      clearInterval(runInterval);
+      clearInterval(jitterInterval);
     }
 
-    function renderMetrics() {
-      document.getElementById('currentNum').innerText = currentAmps.toFixed(1);
+    function renderTelemetry() {
+      document.getElementById('currentAmpsText').innerHTML = `${currentAmps.toFixed(1)}<span class="measured-unit">A</span>`;
+      document.getElementById('ctStatusVal').innerText = `${currentAmps.toFixed(1)} A`;
+
       const kw = (currentAmps * 230 * 0.88 / 1000).toFixed(2);
-      document.getElementById('powerNum').innerText = kw;
+      document.getElementById('activeKwText').innerHTML = `${kw}<span class="measured-unit">kW</span>`;
     }
 
-    function renderTank() {
-      document.getElementById('liquidBody').style.height = currentTankLevel + '%';
-      document.getElementById('tankLevelPct').innerText = Math.round(currentTankLevel) + '%';
-      const depth = (currentTankLevel * 5.0 / 100).toFixed(1);
-      document.getElementById('tankDepthFt').innerText = `${depth} ft`;
+    function renderSightGlass() {
+      document.getElementById('liquidColumn').style.height = tankLevelPct + '%';
+      document.getElementById('tankLevelText').innerHTML = `${Math.round(tankLevelPct)}<span class="measured-unit">%</span>`;
 
-      const mins = Math.max(0, Math.round((100 - currentTankLevel) * 0.4));
-      document.getElementById('tankEstMins').innerText = isRunning ? `~${mins} Mins to Full` : 'Pumping Paused';
-      document.getElementById('tankSlider').value = Math.round(currentTankLevel);
-      document.getElementById('sliderValDisplay').innerText = `${Math.round(currentTankLevel)}% (Tap/Drag to simulate)`;
-    }
+      const depth = (tankLevelPct * 5.0 / 100).toFixed(2);
+      document.getElementById('tankDepthText').innerText = `${depth} ft / 5.0 ft capacity`;
 
-    function onSliderChange(val) {
-      currentTankLevel = parseFloat(val);
-      renderTank();
-      if (currentTankLevel >= 100) {
-        triggerOverflow();
+      const mins = Math.max(0, Math.round((100 - tankLevelPct) * 0.4));
+      document.getElementById('estFillText').innerText = isRunning ? `${mins} minutes` : 'Pump idle';
+
+      document.getElementById('levelSlider').value = Math.round(tankLevelPct);
+      document.getElementById('sliderValLabel').innerText = `${Math.round(tankLevelPct)}%`;
+
+      const foilChip = document.getElementById('foilChip');
+      if (tankLevelPct >= 100) {
+        foilChip.className = 'chip chip-bad';
+        foilChip.innerText = 'Tripped (Overflow)';
+      } else {
+        foilChip.className = 'chip chip-cool';
+        foilChip.innerText = 'Armed (+184 pF)';
       }
     }
 
-    // Sandbox Demonstration Scenarios
-    function triggerDryRun() {
-      soundHaptic();
-      if (!isRunning) startPump();
+    function onSliderAdjust(val) {
+      tankLevelPct = parseFloat(val);
+      renderSightGlass();
+      if (tankLevelPct >= 100) {
+        simulateOverflow();
+      }
+    }
+
+    // Operator Safety Test Simulations
+    function simulateDryRun() {
+      soundKeypress();
+      if (!isRunning) engagePump();
 
       setTimeout(() => {
-        showToast('⚠️', 'Borewell water depleted! Current dropping...');
         currentAmps = 2.4;
-        renderMetrics();
+        renderTelemetry();
+        logEvent('ZMCT103C', 'sensor', 'Borewell water depleted: RMS current dropped to 2.4A (< 4.0A threshold)', 'WARNING', 'chip chip-amber');
 
-        const badge = document.getElementById('pumpBadge');
-        badge.className = 'status-badge-liquid badge-starting';
-        badge.innerText = '⚠️ DRY-RUN DETECTED (8s TRIP)...';
-        updateDynamicIsland('Dry-Run (<4A)', 'fault');
+        const title = document.getElementById('motorStateTitle');
+        title.innerText = 'Dry-run detected: 8s safety timer counting down';
+        title.style.color = 'var(--color-accent)';
 
         setTimeout(() => {
-          currentFault = 'DRY_RUN';
-          stopPump();
-          chimeAlarm();
+          activeFault = 'BOREWELL DRY-RUN';
+          disengagePump('8s thermal cutoff triggered');
+          soundAlarm();
 
-          badge.className = 'status-badge-liquid badge-fault';
-          badge.innerText = '🚨 FAULT: BOREWELL DRY-RUN TRIP';
-          document.getElementById('puckChassis').className = 'puck-chassis is-fault';
-          updateDynamicIsland('Borewell Dry-Run', 'fault');
-          showToast('🚨', 'Dry Run Protection Cutoff! Motor saved from burnout');
+          title.innerText = 'Tripped: Borewell dry-run protection cutoff';
+          title.style.color = 'var(--color-bad)';
+
+          logEvent('SAFETY', 'fault', 'Dry-run lockout engaged: Pump auto-stopped to prevent impeller seizure', 'TRIPPED', 'chip chip-bad');
         }, 2500);
       }, 1500);
     }
 
-    function triggerMotorJam() {
-      soundHaptic();
-      if (!isRunning) startPump();
+    function simulateOverload() {
+      soundKeypress();
+      if (!isRunning) engagePump();
 
       setTimeout(() => {
-        showToast('🚨', 'Motor Jam Simulated! Current spiking > 16A');
-        currentAmps = 18.2;
-        renderMetrics();
+        currentAmps = 18.6;
+        renderTelemetry();
 
-        currentFault = 'OVERLOAD';
-        stopPump();
-        chimeAlarm();
+        activeFault = 'MOTOR OVERLOAD';
+        disengagePump('Instant current surge trip (>16.0A)');
+        soundAlarm();
 
-        const badge = document.getElementById('pumpBadge');
-        badge.className = 'status-badge-liquid badge-fault';
-        badge.innerText = '🚨 FAULT: MOTOR OVERLOAD TRIP (18.2A)';
-        document.getElementById('puckChassis').className = 'puck-chassis is-fault';
-        updateDynamicIsland('Motor Jam (>16A)', 'fault');
+        const title = document.getElementById('motorStateTitle');
+        title.innerText = 'Tripped: Overload spike captured (18.6 A)';
+        title.style.color = 'var(--color-bad)';
+
+        logEvent('ZMCT103C', 'fault', 'Hardware interrupt fired: 18.6A current trip executed in 74ms', 'OVERLOAD', 'chip chip-bad');
       }, 1200);
     }
 
-    function triggerOverflow() {
-      currentTankLevel = 100;
-      renderTank();
+    function simulateOverflow() {
+      tankLevelPct = 100;
+      renderSightGlass();
 
-      if (isRunning) stopPump();
-      chimeFanfare();
-      updateDynamicIsland('Tank Full 100%', 'idle');
-      showToast('🏆', 'Victory Fanfare! Foil sensor tripped, pump auto-stopped');
+      if (isRunning) disengagePump('Capacitive foil overflow cut');
+      soundVictory();
+
+      logEvent('FOIL TAPE', 'sensor', 'Contactless foil dielectric tripped (+840 pF): Tank 100% full', 'FULL', 'chip chip-ok');
     }
 
-    function triggerWatchdog() {
-      soundHaptic();
-      showToast('📡', 'Simulating 250m link loss...');
-      document.getElementById('radioNum').innerText = '--';
+    function simulateLinkLoss() {
+      soundKeypress();
+      document.getElementById('rssiVal').innerText = '-- dBm';
+      document.getElementById('linkChip').className = 'chip chip-bad';
+      document.getElementById('linkChip').innerText = 'Link: LOST';
+
+      logEvent('ESP-NOW', 'sensor', '250m long-range heartbeat missing: 3-min watchdog countdown initiated', 'LINK LOST', 'chip chip-bad');
+
       setTimeout(() => {
-        currentFault = 'WATCHDOG';
-        stopPump();
-        chimeAlarm();
-        const badge = document.getElementById('pumpBadge');
-        badge.className = 'status-badge-liquid badge-fault';
-        badge.innerText = '🚨 FAULT: 3-MIN WATCHDOG TIMEOUT';
-        document.getElementById('puckChassis').className = 'puck-chassis is-fault';
-        updateDynamicIsland('250m Lost', 'fault');
-      }, 1500);
+        activeFault = 'WATCHDOG TIMEOUT';
+        disengagePump('3-min link watchdog expiration');
+        soundAlarm();
+
+        const title = document.getElementById('motorStateTitle');
+        title.innerText = 'Tripped: 250m radio link loss timeout';
+        title.style.color = 'var(--color-bad)';
+
+        logEvent('WATCHDOG', 'fault', 'Safety fail-safe executed: Pump shut down due to telemetry loss', 'TIMEOUT', 'chip chip-bad');
+      }, 2000);
     }
 
-    function triggerReset() {
-      soundHaptic();
-      currentFault = null;
-      stopPump();
-      currentTankLevel = 65;
-      runSeconds = 0;
-      document.getElementById('runtimeClock').innerText = 'Runtime: 00:00:00';
-      document.getElementById('radioNum').innerText = '-62';
-      updateDynamicIsland('Standby', 'idle');
-      renderTank();
-      showToast('🔄', 'All systems reset to normal standby');
+    function resetInstrument() {
+      soundKeypress();
+      activeFault = null;
+      disengagePump('Operator reset');
+      tankLevelPct = 65;
+      runtimeSec = 0;
+      document.getElementById('runtimeDisplay').innerText = '00:00:00';
+      document.getElementById('rssiVal').innerText = '-62 dBm';
+      document.getElementById('linkChip').className = 'chip chip-ok';
+      document.getElementById('linkChip').innerText = 'Link: 250m OK';
+
+      const title = document.getElementById('motorStateTitle');
+      title.innerText = 'Standby / Ready';
+      title.style.color = 'var(--color-ink)';
+
+      renderSightGlass();
+      renderTelemetry();
+      logEvent('OPERATOR', 'operator', 'Safety registers cleared: Instrument returned to normal standby', 'STANDBY', 'chip chip-ok');
     }
 
-    function triggerOTA() {
-      soundHaptic();
-      const fill = document.getElementById('otaBar');
-      const statusText = document.getElementById('otaStatusLbl');
-      const pctText = document.getElementById('otaPctLbl');
+    function runOTAUpdate() {
+      soundKeypress();
+      const btn = document.getElementById('otaBtn');
+      btn.innerText = 'Downloading v2.5.0...';
 
-      statusText.innerText = 'Downloading v2.5.0 from GitHub Releases...';
-      let progress = 0;
-      const timer = setInterval(() => {
-        progress += 5;
-        fill.style.width = progress + '%';
-        pctText.innerText = progress + '%';
+      logEvent('OTA AGENT', 'sensor', 'Connecting to HiveMQ Cloud TLS broker for v2.5.0 binary', 'PULLING', 'chip chip-cool');
 
-        if (progress >= 100) {
-          clearInterval(timer);
-          statusText.innerText = 'Flashing ESP32 Flash Memory...';
+      setTimeout(() => {
+        btn.innerText = 'Flashing ESP32 memory (64%)...';
+        setTimeout(() => {
+          btn.innerText = 'Rebooting ESP32...';
           setTimeout(() => {
-            statusText.innerText = 'Rebooting ESP32...';
-            setTimeout(() => {
-              statusText.innerText = '✅ Updated to v2.5.0 (Online)';
-              chimeStart();
-              showToast('⚡', 'Firmware v2.5.0 installed wirelessly via Cloud OTA!');
-            }, 1000);
-          }, 800);
-        }
-      }, 70);
+            btn.innerText = 'Firmware v2.5.0 Active';
+            btn.className = 'btn-key chip-ok';
+            soundVictory();
+            logEvent('BOOTLOADER', 'sensor', 'ESP32 OTA flash verified: Running firmware v2.5.0-release', 'UPDATED', 'chip chip-ok');
+          }, 1000);
+        }, 1200);
+      }, 1000);
     }
 
     // Initial Render
-    renderTank();
-    renderMetrics();
+    renderSightGlass();
+    renderTelemetry();
   </script>
 </body>
 </html>
