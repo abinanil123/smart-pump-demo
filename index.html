@@ -412,6 +412,9 @@
       transform: translateX(-50%) translateY(0);
     }
   </style>
+  <!-- Firebase Realtime Cloud SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -455,8 +458,12 @@
       <span id="pumpBtnText">Start Pump</span>
     </button>
 
-    <!-- Integrated Telemetry Strip (3 Columns) -->
-    <section class="telemetry-strip">
+    <!-- Integrated Telemetry Strip (4 Columns) -->
+    <section class="telemetry-strip" style="grid-template-columns: repeat(4, 1fr); padding: 12px 10px; gap: 8px;">
+      <div class="telemetry-col">
+        <span class="telemetry-label">Grid voltage</span>
+        <span class="telemetry-val" id="voltageVal">230 V</span>
+      </div>
       <div class="telemetry-col">
         <span class="telemetry-label">Load current</span>
         <span class="telemetry-val" id="ampsVal">0.0 A</span>
@@ -473,28 +480,145 @@
 
     <!-- Unobtrusive Test Triggers (Bottom Shelf) -->
     <section class="test-shelf">
-      <div class="test-shelf-label">Simulate safety cutoffs:</div>
-      <div class="test-chips">
-        <button class="test-chip" onclick="simulateDryRun()">Dry-Run</button>
-        <button class="test-chip" onclick="simulateOverload()">Overload</button>
-        <button class="test-chip" onclick="simulateOverflow()">Overflow</button>
-        <button class="test-chip" onclick="simulateLinkLoss()">Lost Link</button>
-        <button class="test-chip full-row" onclick="resetSystem()">Reset to standby</button>
+      <div class="test-shelf-label">Simulate safety cutoffs (ZMPT101B + ZMCT103C):</div>
+      <div class="test-chips" style="grid-template-columns: repeat(3, 1fr);">
+        <button class="test-chip" onclick="simulateDryRun()">Dry-Run (&lt;4A)</button>
+        <button class="test-chip" onclick="simulateOverload()">Overload (&gt;16A)</button>
+        <button class="test-chip" onclick="simulateOverflow()">Overflow (Full)</button>
+        <button class="test-chip" onclick="simulateBrownout()">Brownout (&lt;175V)</button>
+        <button class="test-chip" onclick="simulateSurge()">Surge (&gt;265V)</button>
+        <button class="test-chip" onclick="simulateLinkLoss()">Lost Link (Watchdog)</button>
+        <button class="test-chip full-row" style="grid-column: span 3;" onclick="resetSystem()">Reset to standby</button>
       </div>
     </section>
 
   </main>
 
   <script>
+    // Firebase Cloud Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCYgqbFgKVAoZ835owETNF1O9Zu8QYwIgc",
+      authDomain: "smart-pump-9b532.firebaseapp.com",
+      databaseURL: "https://smart-pump-9b532-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "smart-pump-9b532",
+      storageBucket: "smart-pump-9b532.firebasestorage.app",
+      messagingSenderId: "109214786839",
+      appId: "1:109214786839:web:d0071d2e066bf0d07b0352"
+    };
+
+    let db = null;
+    let isCloudOnline = false;
+
     // System State
     let isRunning = false;
     let isStarting = false;
     let activeFault = null;
     let currentAmps = 0.0;
+    let gridVoltage = 230.0;
     let currentLevel = 65;
     let runtimeSec = 0;
     let runTimer = null;
     let audioEnabled = true;
+
+    // Initialize Firebase Realtime Sync & Connection Mode Detection
+    const isLocalHost = window.location.hostname === 'pump.local' ||
+                        /^192\.168\./.test(window.location.hostname) ||
+                        /^10\./.test(window.location.hostname) ||
+                        /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(window.location.hostname);
+
+    if (isLocalHost) {
+      console.log("Direct ESP32 Local Mode active (http://" + window.location.hostname + ")");
+      const statusLbl = document.getElementById('statusLabel');
+      if (statusLbl) statusLbl.innerText = 'Local Direct';
+      
+      // Direct polling from ESP32 local WebServer
+      setInterval(() => {
+        fetch('/status')
+          .then(res => res.json())
+          .then(data => {
+            if (data.voltage !== undefined) gridVoltage = data.voltage;
+            if (data.current !== undefined) currentAmps = data.current;
+            if (data.waterLevel !== undefined) {
+              currentLevel = data.waterLevel;
+              renderLevel();
+            }
+            if (data.running !== undefined && !isStarting) {
+              if (data.running !== isRunning) {
+                isRunning = data.running;
+                const btn = document.getElementById('pumpBtn');
+                const text = document.getElementById('pumpBtnText');
+                if (isRunning) {
+                  btn.className = 'pump-btn running';
+                  text.innerText = `Stop Pump (${currentAmps.toFixed(1)} A)`;
+                  document.getElementById('statusDot').className = 'status-dot';
+                  document.getElementById('statusLabel').innerText = `${currentAmps.toFixed(1)}A running`;
+                  startTimers();
+                } else {
+                  btn.className = 'pump-btn';
+                  text.innerText = 'Start Pump';
+                  document.getElementById('statusDot').className = 'status-dot';
+                  document.getElementById('statusLabel').innerText = 'Local Direct';
+                  stopTimers();
+                }
+              }
+            }
+            renderTelemetry();
+          })
+          .catch(e => console.log('Local status fetch note:', e));
+      }, 2000);
+    }
+
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+      isCloudOnline = true;
+      console.log("Firebase Realtime Cloud connected!");
+      if (!isLocalHost) {
+        const statusLbl = document.getElementById('statusLabel');
+        if (statusLbl) statusLbl.innerText = 'Cloud Sync Live';
+      }
+
+      // Realtime listener for live telemetry
+      db.ref('telemetry').on('value', (snapshot) => {
+        const val = snapshot.val();
+        if (val) {
+          if (val.voltage !== undefined) gridVoltage = val.voltage;
+          if (val.current !== undefined) currentAmps = val.current;
+          if (val.waterLevel !== undefined) {
+            currentLevel = val.waterLevel;
+            renderLevel();
+          }
+          if (val.pumpRunning !== undefined && !isStarting) {
+            if (val.pumpRunning !== isRunning) {
+              isRunning = val.pumpRunning;
+              const btn = document.getElementById('pumpBtn');
+              const text = document.getElementById('pumpBtnText');
+              if (isRunning) {
+                btn.className = 'pump-btn running';
+                text.innerText = `Stop Pump (${currentAmps.toFixed(1)} A)`;
+                document.getElementById('statusDot').className = 'status-dot';
+                document.getElementById('statusLabel').innerText = `${currentAmps.toFixed(1)}A running`;
+                startTimers();
+              } else {
+                btn.className = 'pump-btn';
+                text.innerText = 'Start Pump';
+                document.getElementById('statusDot').className = 'status-dot';
+                document.getElementById('statusLabel').innerText = 'Cloud Sync Live';
+                stopTimers();
+              }
+            }
+          }
+          if (val.fault && val.fault !== 'NONE') {
+            activeFault = val.fault;
+          } else {
+            activeFault = null;
+          }
+          renderTelemetry();
+        }
+      });
+    } catch (err) {
+      console.warn("Local simulation fallback active:", err);
+    }
 
     // Web Audio Synthesizer (Harmonic Clean Tones)
     let audioCtx = null;
@@ -567,8 +691,21 @@
         return;
       }
       if (isRunning || isStarting) {
+        if (isLocalHost) {
+          fetch('/stop', { method: 'POST' }).catch(e => console.log('Local stop err:', e));
+        }
+        if (db) {
+          db.ref('command').set({ action: 'STOP', timestamp: Date.now() });
+          db.ref('telemetry/pumpRunning').set(false);
+        }
         stopPump();
       } else {
+        if (isLocalHost) {
+          fetch('/start', { method: 'POST' }).catch(e => console.log('Local start err:', e));
+        }
+        if (db) {
+          db.ref('command').set({ action: 'START', timestamp: Date.now() });
+        }
         startPump();
       }
     }
@@ -599,6 +736,15 @@
 
         startTimers();
         renderTelemetry();
+        if (db) {
+          db.ref('telemetry').update({
+            pumpRunning: true,
+            current: 10.2,
+            voltage: 230.0,
+            power: 1.99,
+            fault: 'NONE'
+          });
+        }
         showNotice('Contactor latched closed');
       }, 1800);
     }
@@ -608,6 +754,14 @@
       isStarting = false;
       currentAmps = 0.0;
       chimeStop();
+
+      if (db) {
+        db.ref('telemetry').update({
+          pumpRunning: false,
+          current: 0.0,
+          power: 0.0
+        });
+      }
 
       const btn = document.getElementById('pumpBtn');
       const text = document.getElementById('pumpBtnText');
@@ -643,8 +797,9 @@
     }
 
     function renderTelemetry() {
+      document.getElementById('voltageVal').innerText = Math.round(gridVoltage) + ' V';
       document.getElementById('ampsVal').innerText = currentAmps.toFixed(1) + ' A';
-      const kw = (currentAmps * 230 * 0.88 / 1000).toFixed(2);
+      const kw = (currentAmps * gridVoltage * 0.85 / 1000).toFixed(2);
       document.getElementById('powerVal').innerText = kw + ' kW';
     }
 
@@ -671,6 +826,9 @@
     function adjustLevel(val) {
       currentLevel = parseFloat(val);
       renderLevel();
+      if (db) {
+        db.ref('telemetry/waterLevel').set(Math.round(currentLevel));
+      }
       if (currentLevel >= 100) {
         simulateOverflow();
       }
@@ -744,9 +902,56 @@
       }, 1800);
     }
 
+    function simulateBrownout() {
+      if (!isRunning) startPump();
+      setTimeout(() => {
+        gridVoltage = 162.0; // Dips below 175V cutoff
+        renderTelemetry();
+        showNotice('Grid voltage dropped to 162V (Brownout)');
+
+        setTimeout(() => {
+          activeFault = 'BROWNOUT (<175V)';
+          stopPump();
+          chimeAlarm();
+
+          const btn = document.getElementById('pumpBtn');
+          btn.className = 'pump-btn fault';
+          document.getElementById('pumpBtnText').innerText = 'Fault: Low Voltage Brownout (162V)';
+
+          document.getElementById('statusDot').className = 'status-dot red';
+          document.getElementById('statusLabel').innerText = 'Brownout trip';
+          showNotice('ZMPT101B cutoff: Stator windings protected');
+        }, 1200);
+      }, 1000);
+    }
+
+    function simulateSurge() {
+      if (!isRunning) startPump();
+      setTimeout(() => {
+        gridVoltage = 278.0; // Surges above 265V cutoff
+        renderTelemetry();
+        showNotice('Grid voltage spiked to 278V (Surge)');
+
+        setTimeout(() => {
+          activeFault = 'SURGE (>265V)';
+          stopPump();
+          chimeAlarm();
+
+          const btn = document.getElementById('pumpBtn');
+          btn.className = 'pump-btn fault';
+          document.getElementById('pumpBtnText').innerText = 'Fault: High Voltage Surge (278V)';
+
+          document.getElementById('statusDot').className = 'status-dot red';
+          document.getElementById('statusLabel').innerText = 'Surge trip';
+          showNotice('ZMPT101B cutoff: Motor protected');
+        }, 1200);
+      }, 1000);
+    }
+
     function resetSystem() {
       activeFault = null;
       stopPump();
+      gridVoltage = 230.0;
       currentLevel = 65;
       runtimeSec = 0;
       document.getElementById('runtimeVal').innerText = '00:00';
